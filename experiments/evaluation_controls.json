@@ -1,0 +1,96 @@
+{
+  "design": {
+    "pseudocount": 16,
+    "lineage_draws": 2000,
+    "random_seed": 701,
+    "numpy": "2.3.5"
+  },
+  "photo_detection_membership": {
+    "train_images": 2697,
+    "train_positives": 526,
+    "validation": {
+      "images": 394,
+      "positives": 75,
+      "lineages": 90,
+      "ap": 0.4537038067517949,
+      "constant_ap": 0.19035532994923857,
+      "difference": 0.26334847680255635,
+      "distinct_scores": 36,
+      "familiar_exact_size": 105
+    },
+    "test": {
+      "images": 808,
+      "positives": 144,
+      "lineages": 153,
+      "ap": 0.4130142220604415,
+      "constant_ap": 0.1782178217821782,
+      "difference": 0.23479640027826332,
+      "distinct_scores": 49,
+      "familiar_exact_size": 190,
+      "valid_resamples": 2000,
+      "difference_interval": [
+        0.08812139018280463,
+        0.4046326586372797
+      ]
+    }
+  },
+  "panoramic_mask_absence": {
+    "train_images": 4150,
+    "train_positives": 440,
+    "validation": {
+      "images": 593,
+      "positives": 61,
+      "lineages": 526,
+      "ap": 0.9411715920714345,
+      "constant_ap": 0.10286677908937605,
+      "difference": 0.8383048129820585,
+      "distinct_scores": 2,
+      "familiar_exact_size": 593
+    },
+    "test": {
+      "images": 1186,
+      "positives": 131,
+      "lineages": 1062,
+      "ap": 0.8777724856146132,
+      "constant_ap": 0.11045531197301856,
+      "difference": 0.7673171736415947,
+      "distinct_scores": 2,
+      "familiar_exact_size": 1186,
+      "valid_resamples": 2000,
+      "difference_interval": [
+        0.7102985289761222,
+        0.8228952993546731
+      ]
+    }
+  },
+  "rank_reversals": {
+    "reference": {
+      "all": {
+        "pairs": 528,
+        "reversals": 93
+      },
+      "different_heads": {
+        "pairs": 390,
+        "reversals": 47
+      },
+      "same_head": {
+        "pairs": 138,
+        "reversals": 46
+      }
+    },
+    "split": {
+      "all": {
+        "pairs": 435,
+        "reversals": 180
+      },
+      "different_heads": {
+        "pairs": 300,
+        "reversals": 130
+      },
+      "same_head": {
+        "pairs": 135,
+        "reversals": 50
+      }
+    }
+  }
+}

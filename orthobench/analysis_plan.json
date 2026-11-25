@@ -1,0 +1,266 @@
+{
+ "frozen_at": "2026-11-08",
+ "purpose": "Revision: test whether the two evaluation variables (split unit, reference-label version) change which models look best, using a broader model suite. Written before any new score was computed.",
+ "fixed_inputs": {
+  "reference_split": "identical to results/reference_evaluation.json: all 240 audited patients withheld from fitting; union of cross-patient DINOv2-S pHash candidates (Hamming <= 6, all modalities) quarantined; test = primary-audit classifiable non-quarantined patients",
+  "training_labels": "original manifest labels of unaudited, non-quarantined patients",
+  "test_labels": [
+   "manifest",
+   "final (adjudicated)"
+  ]
+ },
+ "zoo": {
+  "encoders": [
+   "resnet18",
+   "resnet50",
+   "convnext_tiny",
+   "convnext_large",
+   "dinov2",
+   "dinov2_base",
+   "dinov2_large",
+   "rad_dino",
+   "siglip2",
+   "clip_b16",
+   "biomedclip"
+  ],
+  "heads": {
+   "logreg": "standardised features, C=1, class_weight=balanced, max_iter=2000",
+   "knn1": "cosine 1-NN",
+   "knn5": "cosine 5-NN, uniform"
+  },
+  "patient_aggregation": "mean of image probabilities, then argmax",
+  "finetuned": {
+   "archs": [
+    "dinov2 (ViT-S/14)",
+    "resnet50",
+    "convnext_tiny"
+   ],
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "epochs": 8,
+   "recipe": "AdamW wd 0.05, cosine schedule, batch 32, class-weighted CE, random 224 crop of 256 cache + brightness jitter; lr backbone 1e-5 (DINOv2, historical recipe) or 1e-4 (CNNs); head lr 1e-3; no early stopping, no test-based selection"
+  },
+  "selection_rule": "no hyperparameter, checkpoint or model selection uses any audited label"
+ },
+ "metrics": {
+  "primary": "patient macro-F1 over three classes",
+  "secondary": "balanced accuracy"
+ },
+ "reference_variable_statistics": {
+  "bootstrap": "2000 patient-bootstrap draws (seed 20261108) shared by all models and both reference versions",
+  "leaderboard_agreement": "Kendall tau-b between manifest-scored and final-scored leaderboards; percentile interval over draws",
+  "winner": "frequency over draws that the top-ranked model is the same under both references; identity of top model under each",
+  "pairwise": "for every model pair, d = (s_i - s_j | final) - (s_i - s_j | manifest); a pair counts as a significant re-ordering only if the point order flips AND the 95% interval of d excludes zero",
+  "primary_hypothesis": "H1: the final-reference leaderboard differs from the manifest leaderboard (tau-b < 1 with interval excluding 1, or >= 1 significant re-ordering)"
+ },
+ "split_variable_statistics": {
+  "design": "full intraoral cohort, source labels, image-level vs patient-level split, test fraction 0.3, seeds 0-4 (image split seeded 1000+s), per-image scoring in both arms (historical design)",
+  "agreement": "Kendall tau-b between regime-mean leaderboards; per-seed tau; per-entry inflation with sample SD over seeds",
+  "primary_hypothesis": "H2: memorising heads (1-NN, 5-NN) gain more under the image split than the linear head, changing the head ranking"
+ },
+ "label_analyses": {
+  "oracle_ceiling": "macro-F1 of the final labels scored against the manifest (and reverse) on the 221 primary classifiable cases, bootstrap interval",
+  "human_reference": "each fixed reviewer account (expert1, expert2) scored against the manifest on 221 cases and on the 189 test cases; not-assessable counts as an error",
+  "changed_case_decomposition": "on test cases where manifest != final: fraction of model predictions equal to the manifest label, to the final label, or to neither; zoo mean with bootstrap interval",
+  "case_difficulty": "final-reference accuracy on initially agreed cases vs senior-adjudicated cases, zoo mean, paired bootstrap",
+  "label_error_detection": "AUROC of 1 - p(manifest label) for predicting manifest != final on the test cases, per encoder (logreg) and for a pre-declared ensemble = mean logreg probability over all 11 encoders; confident-learning flags with per-class thresholds from 5-fold out-of-fold training probabilities; precision and recall",
+  "noise_robust_training": "confident-learning pruning of training patients (5-fold out-of-fold logreg probabilities, per-class thresholds, prune flagged off-diagonal patients), refit, score under both references; paired difference vs unpruned per encoder",
+  "noise_robust_hypothesis": "H3: pruning changes final-reference scores more favourably than manifest scores"
+ },
+ "fusion": {
+  "late_fusion": "per encoder, average patient probabilities of the modality-specific logreg models over the modalities each test patient has; compared with intraoral-only on the same 189 patients (paired bootstrap)",
+  "modality_headroom": "zoo-mean logreg macro-F1 per modality on identical patients (intraoral vs OPG on patients with both; intraoral vs cephalogram on patients with both), paired bootstrap"
+ },
+ "reporting": "all outcomes reported whether or not hypotheses hold; null results stated as nulls",
+ "amendments": [
+  {
+   "date": "2026-11-14",
+   "logged_before_running": true,
+   "status": "exploratory, added after the frozen plan; all on cached features or stored per-patient predictions (CPU); no model is refit for selection and no audited label is used for fitting",
+   "analyses": {
+    "C1_feature_distance": "for ResNet-18, ConvNeXt-T, DINOv2-S, BiomedCLIP intraoral caches (and all encoders on OPG/ceph for the supplement): per image, cosine distance to its nearest other image of (a) the same patient, (b) another patient with the same source label, (c) another patient with another source label; and the fraction of images whose nearest neighbour comes from the same patient. Aggregates only -> results/feature_distance.json",
+    "C3_modality_paired": "re-score the intraoral linear-probe predictions on exactly the test patients that have an OPG (resp. cephalogram) prediction, against the adjudicated label; must reproduce fusion_late.json zoo means -> results/modality_paired.json",
+    "C4_rank_stability": "over the same 2,000 patient-bootstrap draws (seed 20261108) used in zoo_reference.json, probability that each entry ranks first under the source label, under the adjudicated label, and under both -> results/rank_stability.json",
+    "C5_expert_subset": "macro-F1 against the source label of each expert reviewer and of fine-tuned DINOv2-S (3-seed mean of per-seed scores) on (a) all 189 test patients with not-assessable counted as an error (as in label_analysis.json) and (b) only the test patients that reviewer could assess -> results/expert_subset.json",
+    "C6_family_summary": "mean patient macro-F1 per pretraining family x adaptation, both labels -> results/family_summary.json",
+    "C7_dentex_count": "fill DENTEX n_images = 3903 in comparison_matrix.json from the DENTEX challenge paper (quoted fact already in number_whitelist.json) and re-render the comparison",
+    "C10_fig2_frame_probs": "per-frame class probabilities of the frozen DINOv2-S linear probe (reference-split fit) for the already-published primer record only; aggregates (per-frame probabilities, no identifiers) -> results/fig2_frame_probs.json",
+    "L1_novelty_check": "read DinoDental (arXiv 2603.28297) and the teledentistry study (doi 10.6026/973206300221974) to confirm neither releases a patient-linked intraoral+OPG+ceph benchmark or keeps original and expert-adjudicated labels"
+   },
+   "not_run_now": [
+    "E1 fine-tuned backbones in the split arm (GPU, ~8.7 h, after Nov 16)",
+    "E2 extra fine-tuning seeds (GPU, ~2.3 h, after Nov 16)"
+   ]
+  },
+  {
+   "date": "2026-11-14",
+   "logged_before_running": true,
+   "reason": "three-perspective review (paper/REVIEW_3P.md): the paper states 'no model reaches an expert' and 'the lead is not significant' without a paired interval for either difference",
+   "status": "exploratory, added after the frozen plan; stored per-patient predictions and the case-level reviewer labels only (CPU, seconds); nothing is refit; reported whatever the outcome",
+   "analyses": {
+    "C11_expert_gap_ci": "for each expert reviewer, paired 95% percentile interval of (reviewer macro-F1 minus fine-tuned DINOv2-S macro-F1, 3-seed mean) against the source label, over the same 2,000 patient-bootstrap draws (seed 20261108) as zoo_reference.json; rule (a) all 189 test patients with not-assessable counted as an error, rule (b) only the patients that reviewer could assess; also the share of draws in which the model scores at or above the reviewer -> results/expert_gap_ci.json",
+    "C12_lead_ci": "paired 95% interval of (fine-tuned DINOv2-S minus fine-tuned ConvNeXt-T) and (fine-tuned DINOv2-S minus the best frozen entry, ResNet-18 linear) macro-F1 under the source and the adjudicated label, same draws -> results/expert_gap_ci.json"
+   }
+  },
+  {
+   "date": "2026-11-16",
+   "logged_at": "2026-11-16 13:30 +04 (before any run)",
+   "logged_before_running": true,
+   "reason": "user request 2026-11-16 (state-of-the-art coverage: SAM and vision-language baselines); coordinator cut-off for new runs 2026-11-16 22:00 local",
+   "status": "post-plan entries, added after the frozen plan; reported whatever the outcome in the leaderboard (separate block), the appendix and one main-text sentence; NOT added to the pre-registered 33-entry statistics (tau_b, pair shifts, rank stability, AUROC, cleaning), which stay unchanged",
+   "privacy": "local models only; patient images are read in place and never leave the machine; no external API",
+   "selection_rule": "selection uses only the 593 unaudited training patients (source labels); the 189 audit-held-out test patients are scored once with the selected configuration; no audited label is used for selection",
+   "analyses": {
+    "P1_sam_vitb_linear": "SAM ViT-B image encoder (facebook/sam-vit-base, transformers SamModel, SamProcessor: longest side 1024 + pad, SAM normalisation), frozen, intraoral photographs only. Two candidate image features from the same forward pass: (a) mean-pooled 256-d neck output (the image embedding SAM's mask decoder reads), (b) mean-pooled 768-d final ViT hidden state before the neck. Head: the frozen-protocol linear probe (standardised, C=1, class-balanced, max_iter 2000), patient = mean of image probabilities. Feature choice (a vs b) by 5-fold patient-grouped stratified CV patient macro-F1 on the training pool (source labels); tie -> (a). Fit on the full training pool (same quarantine/split masks as zoo.predict), predict the 189 test patients once. Heavy step via .cache/benchmark/run_heavy.sh only -> data/feat_cache/sam_vitb_intraoral.npz",
+    "P2_zero_shot_clip": "zero-shot CLIP-B/16 (open_clip ViT-B-16 openai) and BiomedCLIP from the existing cached image embeddings (encode_image outputs, L2-normalised) and locally computed text embeddings of four pre-declared prompt templates for Class I/II/III; image probabilities = softmax(model logit_scale * cosine); patient = mean of image probabilities. Template per model selected by patient macro-F1 on the 593 training patients (source labels, no fitting); score the 189 test patients once. CPU only",
+    "P3_optional_local_vlm": "a small local open generative VLM only if P1 and P2 finish with compute to spare before the cut-off; otherwise not run and not claimed",
+    "scoring": "macro-F1 (primary) and balanced accuracy against source and adjudicated labels, 95% intervals over the same 2,000 patient-bootstrap draws (seed 20261108) as zoo_reference.json, paired difference to the current leader (fine-tuned DINOv2-S, mean of 3 seeds) -> results/postplan_baselines.json",
+    "stop_rule": "if any post-plan entry's point estimate exceeds the current leader under either label, stop and tell the coordinator before any claim is changed; the abstract is fixed"
+   },
+   "prompt_templates": [
+    "an intraoral photograph showing Angle {cls} malocclusion",
+    "a dental photograph of an Angle {cls} molar relationship",
+    "Angle {cls}",
+    "an intraoral photograph of a patient with {desc}"
+   ],
+   "prompt_classes": {
+    "cls": [
+     "Class I",
+     "Class II",
+     "Class III"
+    ],
+    "desc": [
+     "a normal molar relationship, Angle Class I",
+     "a distal molar relationship, Angle Class II malocclusion",
+     "a mesial molar relationship, Angle Class III malocclusion"
+    ]
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_before_running": true,
+   "reason": "external review (round 8): is the label-version reordering (Kendall tau_b = 0.65) larger than sampling noise or than any 64 label changes?",
+   "status": "exploratory, post-plan; stored per-patient predictions of the 33 planned entries only (CPU); nothing refit; reported whatever the outcome",
+   "analyses": {
+    "N1_bootstrap_pairs": "1,000 pairs of independent patient-bootstrap resamples of the 189 test patients (seed 20261117); for each pair, Kendall tau_b between the 33-entry macro-F1 leaderboards on the two resamples under the SAME label version; done separately for the source and the adjudicated label",
+    "N2_random_relabel": "1,000 draws (seed 20261117): choose 64 of the 189 test patients uniformly at random and replace each one's source label by one of the two other classes uniformly at random; Kendall tau_b between the source-label leaderboard and the relabelled leaderboard on the full test set (same predictions)",
+    "report": "median and 2.5/97.5 percentiles of each null, and the share of null draws with tau_b <= 0.65 (observed source-vs-adjudicated value) -> results/label_version_null.json"
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "before running (round 9)",
+   "logged_before_running": true,
+   "reason": "user decision after external review: how stable is the order of the 30 frozen entries beyond the single reference split?",
+   "status": "exploratory, post-plan; cached intraoral features only (CPU, nice -n 10, < 2 GB); no audited patient is used; fine-tuned entries stay on the fixed reference split; reported whatever the outcome",
+   "analyses": {
+    "R1_repeated_cv": "patient-level stratified 5-fold CV repeated 5 times (shuffle seeds 0-4) over the 593 unaudited, non-quarantined training patients (the reference-arm training pool), source labels; the same folds for all 30 frozen entries (10 encoders x linear / 1-NN / 5-NN, frozen-protocol heads); patient = mean of image probabilities; patient macro-F1 per held-out fold -> per entry mean and SD over the 25 folds and over the 5 repeat-level pooled scores",
+    "R2_tiers": "corrected repeated k-fold t-test (Nadeau-Bengio variance correction, factor 1/25 + 1/4) on per-fold differences, two-sided 5%; tier 1 = best mean entry plus all entries not significantly below it; then repeat on the remaining entries -> results/repeated_cv.json"
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 13:07 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "external review request: were the 240 audited patients selected in a class-dependent way? (post-plan)",
+   "status": "post-plan descriptive check; patient-level source labels only (seconds, CPU); nothing is fitted; reported whatever the outcome",
+   "analyses": {
+    "D1_audit_selection": "source (manifest) label counts of the 240 audited patients (updates/OrthoLabel_EDA.xlsx, sheet 'Analysis Data', column manifest_label) versus the unaudited patients (union of DINOv2-S feature caches over intraoral/OPG/cephalogram, label_numeric, patients not in the export); 2x3 Pearson chi-square without continuity correction -> scripts/audit_selection_check.py, results/audit_selection.json. The sampling rule itself is not recorded in the export and is not inferred.",
+    "C0_resnet50_collapse_note": "no new analysis: read predicted-class counts of the three stored fine-tuned ResNet-50 runs (data/preds/finetune_reference_preds.npz) and the scores in results/finetune_reference.json, and compare with a constant Class-I prediction on the same 189 test patients; written to results/audit_selection.json under resnet50_collapse"
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 13:13 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "external review request: the protocol fine-tuned ResNet-50 collapsed (seeds 0 and 1 predict Class I for every test patient); does a lower backbone learning rate with warmup train it? (post-plan)",
+   "status": "post-plan entry; reported next to the protocol ResNet-50 row, which stays unchanged; not added to the 33-entry statistics; reported whatever the outcome; GPU/MPS via .cache/benchmark/run_heavy.sh, one seed per call",
+   "selection_rule": "no selection: the recipe is fixed here and is not tuned on test or train; the backbone rate 1e-5 is the protocol rate of fine-tuned DINOv2-S",
+   "analyses": {
+    "C1_resnet50_warmup": "fine-tuned ResNet-50 (ImageNet-1k V2 weights) on the reference split (593 training patients, 4,133 photographs; 189 test patients), identical to the protocol recipe (batch 16, 8 epochs, AdamW, head lr 1e-3, weight decay 0.05, 224 random crop of the 256 cache, brightness jitter, class-weighted cross-entropy, patient = mean image probability) except backbone lr 1e-4 -> 1e-5 and a linear warmup of both learning rates from 0 over the first epoch (259 steps) followed by cosine decay to 0 over the remaining 1,813 steps; seeds 0, 1, 2 -> scripts/review_resnet50_warmup.py, results/review_runs/resnet50_warmup_s*.json; aggregated with the shared 2,000 bootstrap draws (seed 20261108) into results/review_resnet50_warmup.json: entry = 3-seed mean, macro-F1 against source and adjudicated labels with 95% intervals, paired difference to the protocol ResNet-50 entry and to fine-tuned DINOv2-S, predicted-class counts per seed"
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 13:14 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "external review request: does a learned fusion of the three record types beat the complete-case concatenation and photographs alone? (post-plan)",
+   "status": "post-plan; cached frozen features only (CPU); historical complete-case cohort and source labels, comparable with results/fusion.json and not with the reference-split leaderboard; reported whatever the outcome",
+   "selection_rule": "all learned components (stacking layer, modality weights) are fitted on out-of-fold probabilities of the training patients of each split; nothing is chosen on the test patients",
+   "analyses": {
+    "B1_learned_fusion": "the 285 patients with all three record types; patient vector = L2-normalised mean image feature; the same 10 stratified 70/30 patient splits (seeds 0-9) and class-balanced logistic probe (C=1) as results/fusion.json. Methods per split: photos only; concatenation of the three blocks (both as fusion.json); stacking = per-modality logistic heads + multinomial logistic layer (balanced, C=1) on their 5-fold out-of-fold log-probabilities; weighted = per-modality heads averaged with simplex weights (step 0.1, 66 candidates) that maximise out-of-fold macro-F1 (ties -> closest to uniform). Two feature sets: primary 'rad' = DINOv2-S photographs + RAD-DINO OPG + RAD-DINO cephalogram (as requested); 'dinov2' = DINOv2-S for all three (the exact features of results/fusion.json, whose photos and concatenation numbers must reproduce). Statistics: mean and SD over the 10 splits, splits won, and 95% intervals of the 10-split mean and of paired differences from 2,000 patient-bootstrap draws per split (seed 20261108 + split seed), averaged across splits draw by draw. Primary comparisons: stack minus concat and stack minus photos on 'rad'. -> scripts/review_learned_fusion.py, results/review_learned_fusion.json"
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 13:18 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "external review request: a multiple-instance baseline that learns which photographs matter, instead of averaging frame probabilities (post-plan)",
+   "status": "post-plan entries; cached frame embeddings only (CPU, via .cache/benchmark/run_heavy.sh, one config or seed per call); not added to the 33-entry statistics; reported whatever the outcome",
+   "selection_rule": "hyperparameters are chosen by patient-grouped stratified 5-fold CV (shuffle seed 0) on the 593 training patients with source labels only; the 189 test patients are scored once with the selected configuration",
+   "analyses": {
+    "A1_attention_mil": "gated attention-MIL (Ilse, Tomczak, Welling, ICML 2018): frame embedding -> Linear(d,128)+ReLU+dropout -> gated attention (V,U: 128->64, w: 64->1, softmax over the patient's frames) -> weighted sum -> Linear(128,3); Adam, batch 16 bags, class-weighted cross-entropy; frame features standardised with statistics of the training frames. Encoders: DINOv2-S (384-d cached features) and SAM ViT-B (768-d mean-pooled ViT state, the feature selected for the SAM post-plan entry). Grid: lr {1e-4, 1e-3} x weight decay {1e-4, 1e-2} x dropout {0, 0.25}, evaluated after 20, 50 and 100 epochs (24 candidates); selection = highest mean CV patient macro-F1 (ties: earlier grid entry, fewer epochs). Final model refit on all 593 training patients with seeds 0, 1, 2; entry = mean of the 3 seeds' scores, as for fine-tuned entries. Scoring: macro-F1 against the source and the adjudicated label with the shared 2,000 patient-bootstrap draws (seed 20261108); paired difference to the linear probe on the same encoder (DINOv2-S / logreg leaderboard entry; SAM ViT-B / logreg post-plan entry) and to fine-tuned DINOv2-S; rank if inserted among the 33 entries -> scripts/review_abmil.py, results/review_abmil.json. The bibliography entry for Ilse et al. (PMLR vol. 80, pp. 2127-2136) is verified with tools/verify_citations.py."
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 19:05 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "follow-up after Sec. L (round 10): the stored ResNet-50 runs (protocol and C1 warmup) give near-uniform test probabilities (largest Class III probability 0.327 over all six runs) and the protocol training loss stays at ln 3 = 1.099 in every epoch (logs/benchmark/jobB2.log), while ConvNeXt-T and DINOv2-S train in the same code. Before reading a class-balancing result, check whether ResNet-50 trains at all in this pipeline (post-plan)",
+   "status": "post-plan diagnostic; training patients only (no test image is read, nothing is scored on test); short runs on GPU/MPS and CPU via a single-job runner; reported whatever the outcome; selects nothing",
+   "analyses": {
+    "C2_resnet50_train_diagnostic": "the same 593 training patients, pixel cache, augmentation, model construction, AdamW (weight decay 0.05) and class-weighted cross-entropy as scripts/finetune_reference.py; one fixed sequence of 100 batches of 16 training images (permutation seed 0), constant learning rates, no scheduler. Arms: (a) MPS, backbone 1e-4 / head 1e-3 (protocol rates); (b) CPU, same rates and batches; (c) MPS, backbone 1e-5 / head 1e-3 (C1 rates, no warmup); (d) MPS, backbone frozen in eval mode, head 1e-3 only. Logged every 10 steps: mean training loss of the last 10 steps, across-batch standard deviation of the 2048-d pooled feature (mean over dimensions), share of exactly-zero features, and the spread of the logits. Also once: largest absolute difference between MPS and CPU eval-mode features on the first batch -> scripts/review_resnet50_diag.py, results/review_runs/resnet50_diag.json"
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 19:24 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "C2 result: with identical initialisation and batches, ResNet-50 at the protocol rates loses its pooled features on MPS within 60 steps (share of exactly-zero features 0.20 -> 0.92) but not on CPU (0.33 at step 100; loss 1.144 -> 1.032). Check whether this is a numerical defect of the MPS backend (gradients already differ at step 1) or sensitivity to rounding, and whether it repeats with another batch order (post-plan)",
+   "status": "post-plan diagnostic; training images only; nothing scored on test; selects nothing; via a single-job runner",
+   "analyses": {
+    "C2b_mps_cpu_lockstep": "one ResNet-50 initialised once and copied to MPS and CPU; the same 30 augmented training batches (tensors built once on CPU and copied) fed to both in lockstep with the protocol rates and loss; per step: relative L2 difference of the full gradient vector, max over parameter tensors of the relative difference, the same restricted to BatchNorm parameters, and the relative difference of all parameters after the AdamW step; also the step-1 relative difference of the BatchNorm running statistics",
+    "C2c_second_order": "arms (a) MPS and (b) CPU of C2 repeated with batch-permutation seed 1 (100 steps, protocol rates) -> both appended to results/review_runs/resnet50_diag2.json (scripts/review_resnet50_diag2.py)"
+   },
+   "outcome_note": "first attempt refused by the guard at 2026-11-17 19:24:14 (global STOP file); run after the user resumed, job ortho-r50diag2 2026-11-17 19:55:36-20:03:41, rc 0 -> results/review_runs/resnet50_diag2.json"
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 20:07 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "C2b gave identical step-1 losses on MPS and CPU but a relative gradient difference of about 6e7 (largest in layer3 BatchNorm biases); check per tensor before relying on it, and whether it disappears with BatchNorm in eval mode (post-plan)",
+   "status": "post-plan diagnostic; one training batch; nothing scored on test; selects nothing; via a single-job runner",
+   "analyses": {
+    "C2d_per_tensor_gradients": "ResNet-50 initialised once, copied to CPU and MPS; one augmented training batch (batch 0 of permutation seed 0) fed to both; class-weighted cross-entropy; one backward pass with (i) the network in train mode (protocol) and (ii) the network in eval mode (BatchNorm uses running statistics); per parameter tensor: gradient L2 norm on CPU and MPS and their relative difference, with float64 accumulation; also the head gradient and the pooled features -> scripts/review_resnet50_diag3.py, results/review_runs/resnet50_diag3.json"
+   },
+   "outcome_note": "run 2026-11-17 20:17:52-20:18:08 (ortho-r50diag3, rc 0): forward features and head gradient agree (rel 9e-6, cosine 1.0000); 159/161 backbone gradient tensors differ (MPS norms 1e5-1e10 x CPU, cosine ~0), starting at the last block (layer4.2.bn3 gradient exactly zero on MPS in train mode); same with BatchNorm in eval mode"
+  },
+  {
+   "date": "2026-11-17",
+   "logged_at": "2026-11-17 20:24 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "C2d: the MPS backward pass of ResNet-50 returns wrong backbone gradients in this environment (torch 2.13.0), so the protocol ResNet-50 entry and the C1 rerun were trained on corrupted gradients. (1) Check whether the same defect affects the other two fine-tuned backbones of the leaderboard (DINOv2-S, ConvNeXt-T), also trained on MPS. (2) Rerun the unchanged protocol ResNet-50 recipe on CPU to measure what the entry scores without the defect (post-plan)",
+   "status": "post-plan; G1 is a one-batch training-image diagnostic (nothing scored); C3 is a post-plan entry reported next to the protocol ResNet-50 row, which stays unchanged in the leaderboard and in every statistic computed from it; not added to the 33-entry statistics; reported whatever the outcome; all via a single-job runner, one seed per call. The protocol loss is already inverse-frequency-weighted cross-entropy with weights from the training images (finetune.py), so no separate class-weighted arm is run; a class-balanced-sampler arm is not run because on CPU it would cost another ~5 h of the shared slot and on MPS it would inherit the defect",
+   "selection_rule": "no selection: the recipe is the frozen protocol recipe; only the device changes",
+   "analyses": {
+    "G1_gradcheck_other_backbones": "C2d repeated (train mode only, the protocol mode) for DINOv2-S (lr as protocol is irrelevant: one backward pass) and ConvNeXt-T: per-tensor relative gradient difference and cosine, MPS vs CPU, one training batch -> scripts/review_resnet50_diag3.py --arch {dinov2, convnext_tiny}, results/review_runs/gradcheck_<arch>.json",
+    "C3_resnet50_protocol_cpu": "fine-tuned ResNet-50 (ImageNet-1k V2) on the reference split (593 training patients, 4,133 photographs; 189 test patients) with the protocol recipe unchanged: AdamW, backbone lr 1e-4, head lr 1e-3, weight decay 0.05, cosine decay from step 1 (no warmup), batch 16, 8 epochs, inverse-frequency-weighted cross-entropy (weights from the training images), 224 random crop of the 256 cache with brightness jitter, patient = mean image probability; device CPU instead of MPS; seeds 0, 1, 2 -> scripts/review_resnet50_balanced.py --arm protocol_cpu, results/review_runs/resnet50_protocol_cpu_s*.json. Aggregated with scripts/review_resnet50_balanced_aggregate.py into results/review_resnet50_balanced.json using the shared 2,000 patient-bootstrap draws (seed 20261108): per seed macro-F1 and balanced accuracy against source and adjudicated labels, per-class recall, confusion matrix, predicted-class counts, largest predicted probability, one-vs-rest AUROC of the Class III probability; entry = 3-seed mean with 95% intervals; paired differences to the protocol (MPS) entry and to the C1 warmup rerun; difference to fine-tuned DINOv2-S; rank if inserted among the 33 entries"
+   },
+   "G1_outcome_and_addendum": "run 2026-11-17 20:43:23-20:43:49 (ortho-gradcheck, rc 0). DINOv2-S: 0/176 tensors differ (median rel 5.8e-6). ConvNeXt-T in train mode is not comparable: torchvision ConvNeXt-T applies stochastic depth (p=0.1) in train mode, so the two devices drop different blocks (forward feature rel diff 0.37 before any backward). Addendum logged 2026-11-17 20:46 +0400 before running: repeat ConvNeXt-T in eval mode (no stochastic depth; ConvNeXt has no BatchNorm) -> results/review_runs/gradcheck_convnext_tiny_eval.json; addendum run 2026-11-17 (ortho-gradcheck-cnx, rc 0): ConvNeXt-T eval mode 0/182 tensors differ (median rel 3.0e-6)",
+   "C3_outcome_note": "run 2026-11-17 20:44:33 - 2026-11-18 01:22:59 (ortho-r50cpu-s0/1/2, rc 0, 5577/5552/5577 s); aggregated -> results/review_resnet50_balanced.json"
+  },
+  {
+   "date": "2026-11-18",
+   "logged_at": "2026-11-18 01:25 +0400 (before running)",
+   "logged_before_running": true,
+   "reason": "C3: the protocol ResNet-50 recipe trained on CPU scores 0.494 / 0.489 (source / adjudicated) against 0.246 / 0.254 for the stored MPS entry, which C2d shows was trained on wrong backbone gradients. How much do the headline 33-entry statistics depend on that one entry? (post-plan)",
+   "status": "post-plan sensitivity analysis on stored per-patient predictions (CPU, seconds); the published leaderboard and its statistics stay as run; reported whatever the outcome",
+   "analyses": {
+    "C3b_leaderboard_sensitivity": "recompute, once with the stored 33 entries (must reproduce the published values) and once with the 'ResNet-50 / fine-tuned' entry replaced by the three C3 CPU seeds (everything else identical): (i) V.leaderboard_shift for macro-F1 and balanced accuracy with the shared 2,000 draws (seed 20261108): Kendall tau_b point and 95% interval, pairs that swap, pairs with a shift interval excluding zero, swaps among them, top entry under each label, P(same top); (ii) the label-null procedure of scripts/label_null.py unchanged (seed 20261117, 1,000 draws; N1 bootstrap pairs per label, N2 64 random relabels): medians, 95% ranges and share <= observed; (iii) P(rank 1) of fine-tuned DINOv2-S under source, adjudicated and both, over the 2,000 shared draws (as results/rank_stability.json); (iv) rank of every fine-tuned entry under both labels -> scripts/review_resnet50_sensitivity.py, results/review_resnet50_sensitivity.json"
+   }
+  }
+ ]
+}

@@ -1,0 +1,221 @@
+{
+ "provenance": "run: aggregates of the restricted manifests, audit workbook and reference-arm split masks",
+ "small_cell_rule": "cross-tab cells with 1..4 patients suppressed (null)",
+ "n_patients": 962,
+ "n_images": 8299,
+ "per_modality": {
+  "intraoral": {
+   "patients": 961,
+   "images": 6935,
+   "images_per_patient_mean": 7.216441207075962,
+   "train_patients": 593,
+   "test_patients": 189,
+   "train_images": 4133,
+   "test_images": 1335,
+   "patients_by_source_class": {
+    "Class I": 514,
+    "Class II": 332,
+    "Class III": 115
+   },
+   "images_by_source_class": {
+    "Class I": 3626,
+    "Class II": 2466,
+    "Class III": 843
+   }
+  },
+  "opg": {
+   "patients": 732,
+   "images": 943,
+   "images_per_patient_mean": 1.2882513661202186,
+   "train_patients": 446,
+   "test_patients": 151,
+   "train_images": 575,
+   "test_images": 190,
+   "patients_by_source_class": {
+    "Class I": 402,
+    "Class II": 243,
+    "Class III": 87
+   },
+   "images_by_source_class": {
+    "Class I": 486,
+    "Class II": 328,
+    "Class III": 129
+   }
+  },
+  "cephalogram": {
+   "patients": 418,
+   "images": 421,
+   "images_per_patient_mean": 1.007177033492823,
+   "train_patients": 253,
+   "test_patients": 79,
+   "train_images": 255,
+   "test_images": 79,
+   "patients_by_source_class": {
+    "Class I": 218,
+    "Class II": 152,
+    "Class III": 48
+   },
+   "images_by_source_class": {
+    "Class I": 220,
+    "Class II": 153,
+    "Class III": 48
+   }
+  }
+ },
+ "per_class": {
+  "Class I": {
+   "patients": 515,
+   "images": 4332
+  },
+  "Class II": {
+   "patients": 332,
+   "images": 2947
+  },
+  "Class III": {
+   "patients": 115,
+   "images": 1020
+  }
+ },
+ "reference_split": {
+  "train_patients": 593,
+  "test_patients": 189,
+  "unused_patients": 180,
+  "unused_audited": 51,
+  "unused_unaudited": 129,
+  "unused_unaudited_quarantined": 128,
+  "unused_unaudited_no_photographs": 1,
+  "unused_audited_quarantined": 35,
+  "train_by_source_class": {
+   "Class I": 316,
+   "Class II": 205,
+   "Class III": 72
+  },
+  "test_by_source_class": {
+   "Class I": 99,
+   "Class II": 69,
+   "Class III": 21
+  },
+  "test_by_adjudicated_class": {
+   "Class I": 108,
+   "Class II": 57,
+   "Class III": 24
+  },
+  "unused_by_source_class": {
+   "Class I": 100,
+   "Class II": 58,
+   "Class III": 22
+  }
+ },
+ "distributions": {
+  "intraoral": {
+   "images_per_patient_hist": {
+    "1": 6,
+    "2": null,
+    "3": 23,
+    "4": 39,
+    "5": 352,
+    "6": 164,
+    "7": 57,
+    "8": 68,
+    "9": 50,
+    "10": 77,
+    "11": 36,
+    "12": 23,
+    "13-19": 45,
+    ">=20": 19
+   },
+   "megapixels": {
+    "p5": 0.8762267,
+    "p25": 1.4399055,
+    "p50": 2.047963,
+    "p75": 2.6277540000000004,
+    "p95": 11.321242099999997
+   },
+   "width": {
+    "p5": 1244.7,
+    "p25": 1515.5,
+    "p50": 1701.0,
+    "p75": 1931.0,
+    "p95": 4233.5999999999985
+   },
+   "height": {
+    "p5": 657.7,
+    "p25": 944.0,
+    "p50": 1214.0,
+    "p75": 1393.0,
+    "p95": 2667.5999999999985
+   },
+   "orientation": {
+    "landscape": 6932,
+    "portrait": null,
+    "square": 0
+   }
+  },
+  "opg": {
+   "images_per_patient_hist": {
+    "1": 537,
+    "2": 182,
+    "3": 10,
+    "4": null
+   },
+   "megapixels": {
+    "p5": 1.2806199,
+    "p25": 2.226176,
+    "p50": 3.72368,
+    "p75": 4.107,
+    "p95": 4.703070499999999
+   },
+   "width": {
+    "p5": 1596.4,
+    "p25": 1849.0,
+    "p50": 2441.0,
+    "p75": 2775.0,
+    "p95": 3027.0
+   },
+   "height": {
+    "p5": 791.8,
+    "p25": 1087.0,
+    "p50": 1480.0,
+    "p75": 1480.0,
+    "p95": 2048.0
+   },
+   "orientation": {
+    "landscape": 864,
+    "portrait": 79,
+    "square": 0
+   }
+  },
+  "cephalogram": {
+   "images_per_patient_hist": {
+    "1": 415,
+    "2": null
+   },
+   "megapixels": {
+    "p5": 0.476655,
+    "p25": 3.5328,
+    "p50": 3.536896,
+    "p75": 4.833,
+    "p95": 4.833
+   },
+   "width": {
+    "p5": 664.0,
+    "p25": 1726.0,
+    "p50": 1785.0,
+    "p75": 2585.0,
+    "p95": 2685.0
+   },
+   "height": {
+    "p5": 729.0,
+    "p25": 1800.0,
+    "p50": 1800.0,
+    "p75": 2048.0,
+    "p95": 2048.0
+   },
+   "orientation": {
+    "landscape": 208,
+    "portrait": 213,
+    "square": 0
+   }
+  }
+ }
+}

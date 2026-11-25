@@ -1,0 +1,41 @@
+{
+ "provenance": "run",
+ "run": "pp_dentexcv3_du_y11s_s0",
+ "data": "dentex_cv3",
+ "model": "runs/pxdet_y11s_s0/weights/best.pt",
+ "imgsz": 640,
+ "epochs_full_passes": 40,
+ "shards": 1,
+ "batch": 8,
+ "seed": 0,
+ "checkpoint_selection": "last epoch (fixed schedule)",
+ "test": {
+  "box": {
+   "map50_95": 0.3834687209707375,
+   "map50": 0.5751597802593225,
+   "map75": 0.4650012374180241,
+   "precision": 0.5703852747344911,
+   "recall": 0.5604925288598738,
+   "per_class_ap50_95": {
+    "Impacted": 0.5551480031252115,
+    "Caries": 0.3598605502113797,
+    "Periapical Lesion": 0.24042887035330537,
+    "Deep Caries": 0.37843746019305335
+   },
+   "per_class_ap50": {
+    "Impacted": 0.8819254542638215,
+    "Caries": 0.4942376389131899,
+    "Periapical Lesion": 0.36749086704011624,
+    "Deep Caries": 0.5569851608201619
+   },
+   "n_classes_evaluated": 4
+  },
+  "speed_ms": {
+   "preprocess": 0.19617848955292969,
+   "inference": 9.468133581541347,
+   "loss": 0.000124432291861967,
+   "postprocess": 6.20501714136042
+  }
+ },
+ "logged_epochs_completed": 40
+}

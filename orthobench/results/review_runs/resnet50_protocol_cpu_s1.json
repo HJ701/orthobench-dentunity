@@ -1,0 +1,52 @@
+{
+ "provenance": "run",
+ "status": "post-plan",
+ "plan_amendment": "experiments/analysis_plan.json amendments[C3_resnet50_protocol_cpu]",
+ "arch": "resnet50",
+ "arm": "protocol_cpu",
+ "recipe": {
+  "device": "cpu",
+  "lr_backbone": 0.0001,
+  "warmup": false,
+  "balanced_sampler": false,
+  "class_weighted_loss": true,
+  "description": "protocol recipe unchanged (inverse-frequency-weighted cross-entropy from the training images, backbone lr 1e-4, head lr 1e-3, cosine from step 1, no warmup, batch 16, 8 epochs), run on CPU instead of MPS"
+ },
+ "seed": 1,
+ "lr_head": 0.001,
+ "batch": 16,
+ "epochs": 8,
+ "warmup_steps": 0,
+ "train_image_counts_I_II_III": [
+  2112,
+  1499,
+  522
+ ],
+ "inverse_frequency_weights": [
+  0.6523042929292929,
+  0.9190571492105848,
+  2.6392081736909323
+ ],
+ "n_train_images": 4133,
+ "n_train_patients": 593,
+ "n_test_patients": 189,
+ "train_loss_per_epoch": [
+  1.0253,
+  0.8583,
+  0.6893,
+  0.496,
+  0.3293,
+  0.2314,
+  0.1841,
+  0.152
+ ],
+ "pred_class_counts_I_II_III": [
+  109,
+  70,
+  10
+ ],
+ "manifest_macro_f1": 0.5084364270370304,
+ "final_macro_f1": 0.49018113722501955,
+ "final_balanced_accuracy": 0.47482131254061083,
+ "wall_seconds": 5542.319830499997
+}

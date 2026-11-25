@@ -1,0 +1,702 @@
+{
+ "provenance": "run (scripts/postplan_analysis.py; post-plan analyses, external review request)",
+ "bootstrap_resamples": 2000,
+ "interval": "95% percentile, paired image bootstrap",
+ "A_iodet_conflict": {
+  "y11n_s0": {
+   "n_test_images": 273,
+   "n_conflict_images": 7,
+   "boxes_in_conflict_images": 26,
+   "all": {
+    "map50_95": 0.1441851001440318,
+    "map50": 0.3512386956256375
+   },
+   "without_conflict": {
+    "map50_95": 0.1486222133735355,
+    "map50": 0.3584145062502302
+   },
+   "diff_all_minus_without": {
+    "map50_95": -0.004437113229503714,
+    "map50": -0.007175810624592716,
+    "ci_map50_95": [
+     -0.012260369382933302,
+     0.0022557137163989986
+    ],
+    "ci_map50": [
+     -0.02049401093319946,
+     0.00367866403915935
+    ]
+   }
+  },
+  "y11n_s1": {
+   "n_test_images": 273,
+   "n_conflict_images": 7,
+   "boxes_in_conflict_images": 26,
+   "all": {
+    "map50_95": 0.1511761086736904,
+    "map50": 0.36766969361820523
+   },
+   "without_conflict": {
+    "map50_95": 0.15621457192924723,
+    "map50": 0.375706871350504
+   },
+   "diff_all_minus_without": {
+    "map50_95": -0.005038463255556819,
+    "map50": -0.008037177732298784,
+    "ci_map50_95": [
+     -0.013511265490102823,
+     0.0020042768791348146
+    ],
+    "ci_map50": [
+     -0.022859550919901266,
+     0.0028400853867996925
+    ]
+   }
+  }
+ },
+ "B_i_dentex_2seeds": {
+  "status": "done",
+  "tag": "existing seeds 0-1",
+  "seeds": [
+   0,
+   1
+  ],
+  "n_images": 50,
+  "per_seed": {
+   "0": {
+    "coco": {
+     "map50_95": 0.39035575564748926,
+     "map50": 0.5651640103562912
+    },
+    "dentunity": {
+     "map50_95": 0.3959051757530691,
+     "map50": 0.5975562390943381
+    },
+    "diff_map50_95": 0.00554942010557985,
+    "ci_diff_map50_95": [
+     -0.05808888657047134,
+     0.05385540728311284
+    ]
+   },
+   "1": {
+    "coco": {
+     "map50_95": 0.36688473257740845,
+     "map50": 0.5360150751283046
+    },
+    "dentunity": {
+     "map50_95": 0.41403276362488334,
+     "map50": 0.6173872348390437
+    },
+    "diff_map50_95": 0.04714803104747489,
+    "ci_diff_map50_95": [
+     0.007701263170188893,
+     0.09513945798126769
+    ]
+   }
+  },
+  "mean": {
+   "coco": {
+    "map50_95": 0.3786202441124489,
+    "map50": 0.5505895427422979
+   },
+   "dentunity": {
+    "map50_95": 0.4049689696889762,
+    "map50": 0.6074717369666909
+   }
+  },
+  "mean_diff_map50_95": 0.026348725576527343,
+  "mean_diff_map50": 0.056882194224393,
+  "ci_mean_diff_map50_95": [
+   -0.006414118997184521,
+   0.06012156480370707
+  ],
+  "ci_mean_diff_map50": [
+   0.01091598125412883,
+   0.11068659003024003
+  ],
+  "seeds_with_dentunity_ahead": 2
+ },
+ "B_ii_dentex_5seeds": {
+  "status": "done",
+  "tag": "seeds 0-4",
+  "seeds": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ],
+  "n_images": 50,
+  "per_seed": {
+   "0": {
+    "coco": {
+     "map50_95": 0.39035575564748926,
+     "map50": 0.5651640103562912
+    },
+    "dentunity": {
+     "map50_95": 0.3959051757530691,
+     "map50": 0.5975562390943381
+    },
+    "diff_map50_95": 0.00554942010557985,
+    "ci_diff_map50_95": [
+     -0.061804432376079084,
+     0.055554064699721115
+    ]
+   },
+   "1": {
+    "coco": {
+     "map50_95": 0.36688473257740845,
+     "map50": 0.5360150751283046
+    },
+    "dentunity": {
+     "map50_95": 0.41403276362488334,
+     "map50": 0.6173872348390437
+    },
+    "diff_map50_95": 0.04714803104747489,
+    "ci_diff_map50_95": [
+     0.00782330234735339,
+     0.09246342157748705
+    ]
+   },
+   "2": {
+    "coco": {
+     "map50_95": 0.3916429914086275,
+     "map50": 0.5712152418203945
+    },
+    "dentunity": {
+     "map50_95": 0.40643938673067115,
+     "map50": 0.6065380760853288
+    },
+    "diff_map50_95": 0.014796395322043632,
+    "ci_diff_map50_95": [
+     -0.012651916499996961,
+     0.04538955470181297
+    ]
+   },
+   "3": {
+    "coco": {
+     "map50_95": 0.36993747964463325,
+     "map50": 0.546918783696346
+    },
+    "dentunity": {
+     "map50_95": 0.3896660863085336,
+     "map50": 0.5741478174073882
+    },
+    "diff_map50_95": 0.01972860666390036,
+    "ci_diff_map50_95": [
+     -0.028212494796814043,
+     0.08696281042981008
+    ]
+   },
+   "4": {
+    "coco": {
+     "map50_95": 0.3937474123123339,
+     "map50": 0.5920120759213119
+    },
+    "dentunity": {
+     "map50_95": 0.391473774818378,
+     "map50": 0.5746911386695045
+    },
+    "diff_map50_95": -0.0022736374939559267,
+    "ci_diff_map50_95": [
+     -0.030256778631073355,
+     0.02935887911937149
+    ]
+   }
+  },
+  "mean": {
+   "coco": {
+    "map50_95": 0.38251367431809846,
+    "map50": 0.5622650373845296
+   },
+   "dentunity": {
+    "map50_95": 0.39950343744710703,
+    "map50": 0.5940641012191207
+   }
+  },
+  "mean_diff_map50_95": 0.016989763129008573,
+  "mean_diff_map50": 0.03179906383459108,
+  "ci_mean_diff_map50_95": [
+   -0.0023490969948865635,
+   0.04089109454979173
+  ],
+  "ci_mean_diff_map50": [
+   0.005971919496706278,
+   0.05668849095380468
+  ],
+  "seeds_with_dentunity_ahead": 4
+ },
+ "B_iii_dentex_cv5": {
+  "status": "done",
+  "per_fold": {
+   "0": {
+    "n_images": 141,
+    "coco": {
+     "map50_95": 0.3726030349087673,
+     "map50": 0.5690205081652426
+    },
+    "dentunity": {
+     "map50_95": 0.3740023482817286,
+     "map50": 0.5699994997718814
+    },
+    "diff_map50_95": 0.0013993133729613416,
+    "diff_map50": 0.0009789916066387239
+   },
+   "1": {
+    "n_images": 141,
+    "coco": {
+     "map50_95": 0.3576587679025716,
+     "map50": 0.5475269630232763
+    },
+    "dentunity": {
+     "map50_95": 0.34527913820997513,
+     "map50": 0.5371143278949624
+    },
+    "diff_map50_95": -0.012379629692596483,
+    "diff_map50": -0.010412635128313918
+   },
+   "2": {
+    "n_images": 141,
+    "coco": {
+     "map50_95": 0.3761514976787267,
+     "map50": 0.5655006527118447
+    },
+    "dentunity": {
+     "map50_95": 0.39550613032499315,
+     "map50": 0.5884809353761525
+    },
+    "diff_map50_95": 0.019354632646266468,
+    "diff_map50": 0.02298028266430785
+   },
+   "3": {
+    "n_images": 141,
+    "coco": {
+     "map50_95": 0.3778743405779772,
+     "map50": 0.5618355130086838
+    },
+    "dentunity": {
+     "map50_95": 0.3834687209707375,
+     "map50": 0.5751597802593225
+    },
+    "diff_map50_95": 0.005594380392760279,
+    "diff_map50": 0.013324267250638622
+   },
+   "4": {
+    "n_images": 141,
+    "coco": {
+     "map50_95": 0.338836646643242,
+     "map50": 0.5309529999321947
+    },
+    "dentunity": {
+     "map50_95": 0.3209307357021195,
+     "map50": 0.5131873669446037
+    },
+    "diff_map50_95": -0.017905910941122483,
+    "diff_map50": -0.01776563298759104
+   }
+  },
+  "mean_coco_map50_95": 0.36462485754225693,
+  "mean_dentunity_map50_95": 0.36383741469791075,
+  "mean_diff_map50_95": -0.0007874428443461756,
+  "mean_diff_map50": 0.0018210546811360472,
+  "ci_fold_stratified_bootstrap": [
+   -0.012047710105391067,
+   0.010555358840283241
+  ],
+  "ci_t_over_folds": [
+   -0.019189991622977437,
+   0.017615105934285086
+  ],
+  "folds_with_dentunity_ahead": 3
+ },
+ "C_rtdetr_iodet": {
+  "status": "done",
+  "val": {
+   "map50_95": 0.131008240748679,
+   "map50": 0.3299199613413502,
+   "map75": 0.08479601592175064,
+   "precision": 0.3560847454945804,
+   "recall": 0.36411152400658753,
+   "per_class_ap50_95": {
+    "Caries": 0.1371282815486244,
+    "Ulcer": 0.20258256503077338,
+    "Tooth Discoloration": 0.16030371996560566,
+    "Gingivitis": 0.02401839644971259
+   },
+   "per_class_ap50": {
+    "Caries": 0.45678497410449537,
+    "Ulcer": 0.4476737755501641,
+    "Tooth Discoloration": 0.3472320771725482,
+    "Gingivitis": 0.06798901853819338
+   },
+   "n_classes_evaluated": 4
+  },
+  "test": {
+   "map50_95": 0.14969102459167655,
+   "map50": 0.37349958012645995,
+   "map75": 0.11207999771419111,
+   "precision": 0.44153516754435507,
+   "recall": 0.40253555848410816,
+   "per_class_ap50_95": {
+    "Caries": 0.12258266981451524,
+    "Ulcer": 0.2553237542945405,
+    "Tooth Discoloration": 0.1284242711720266,
+    "Gingivitis": 0.09243340308562384
+   },
+   "per_class_ap50": {
+    "Caries": 0.397838442028858,
+    "Ulcer": 0.5632156965205728,
+    "Tooth Discoloration": 0.2832996697275637,
+    "Gingivitis": 0.2496445122288453
+   },
+   "n_classes_evaluated": 4
+  },
+  "batch": 2,
+  "epochs_full_passes": 40,
+  "logged_epochs_completed": 40,
+  "diff_vs_y11n_s0_map50_95": 0.005505924702701559,
+  "ci_diff_vs_y11n_s0_map50_95": [
+   -0.017890496362545163,
+   0.029046863707520118
+  ],
+  "peak_mps_driver_gb": 4.126,
+  "peak_rss_gb": 1.814,
+  "last_logged_epoch": 41
+ },
+ "A_types": {
+  "provenance": "run (scripts/label_conflict_types.py over data/inv_io_det.json + data/bench.json; post-plan analysis A, external review request)",
+  "io_det_files": 1508,
+  "exact_duplicate_groups": 101,
+  "conflicting_groups": 79,
+  "duplicate_groups_by_split": {
+   "train": 81,
+   "val": 8,
+   "test": 12
+  },
+  "conflicting_groups_by_split": {
+   "train": 67,
+   "val": 5,
+   "test": 7
+  },
+  "type_order": [
+   "count",
+   "class",
+   "iou<0.5",
+   "iou0.5-0.9",
+   "iou>=0.9"
+  ],
+  "exclusive_type_by_split": {
+   "count": {
+    "train": 39,
+    "val": 4,
+    "test": 4,
+    "all": 47
+   },
+   "class": {
+    "train": 2,
+    "val": 0,
+    "test": 0,
+    "all": 2
+   },
+   "iou<0.5": {
+    "train": 9,
+    "val": 0,
+    "test": 1,
+    "all": 10
+   },
+   "iou0.5-0.9": {
+    "train": 17,
+    "val": 1,
+    "test": 2,
+    "all": 20
+   },
+   "iou>=0.9": {
+    "train": 0,
+    "val": 0,
+    "test": 0,
+    "all": 0
+   }
+  },
+  "nonexclusive_type_counts": {
+   "count": 47,
+   "class": 2,
+   "iou<0.5": 17,
+   "iou0.5-0.9": 27,
+   "iou>=0.9": 1
+  },
+  "copies_per_conflicting_group": {
+   "2": 57,
+   "3": 15,
+   "6": 1,
+   "5": 3,
+   "4": 3
+  },
+  "kept_copy_rule": "max (number of boxes, path) per sha256 group (dentunity/build.py)",
+  "conflicting_test_images": 7
+ },
+ "D_same_patient": {
+  "provenance": "run (scripts/same_patient_band.py over data/linkemb_px.npz + data/bench.json; post-plan analysis D, external review request)",
+  "tau_copy": 0.9806216955184937,
+  "bands": {
+   "[0.90,0.95)": [
+    0.9,
+    0.95
+   ],
+   "[0.95,tau)": [
+    0.95,
+    0.9806216955184937
+   ],
+   ">=tau": [
+    0.9806216955184937,
+    null
+   ]
+  },
+  "note": "candidates only: high descriptor similarity below the copy threshold; no identity check",
+  "canonical": {
+   "sizes": {
+    "train": 4150,
+    "val": 593,
+    "test": 1186
+   },
+   "val-train": {
+    "[0.90,0.95)": {
+     "pairs": 1370678,
+     "val_images_with_partner": 593,
+     "train_images_with_partner": 4139
+    },
+    "[0.95,tau)": {
+     "pairs": 667766,
+     "val_images_with_partner": 579,
+     "train_images_with_partner": 3986
+    },
+    ">=tau": {
+     "pairs": 1853,
+     "val_images_with_partner": 231,
+     "train_images_with_partner": 799
+    },
+    "max_sim_quantiles_q50_q90_q99_max": [
+     0.9793,
+     0.9842,
+     0.9862,
+     0.9882
+    ],
+    "val_images_whose_nearest_train_is_in_[0.95,tau)": 348
+   },
+   "test-train": {
+    "[0.90,0.95)": {
+     "pairs": 2709367,
+     "test_images_with_partner": 1186,
+     "train_images_with_partner": 4143
+    },
+    "[0.95,tau)": {
+     "pairs": 1396154,
+     "test_images_with_partner": 1162,
+     "train_images_with_partner": 4025
+    },
+    ">=tau": {
+     "pairs": 4250,
+     "test_images_with_partner": 488,
+     "train_images_with_partner": 1144
+    },
+    "max_sim_quantiles_q50_q90_q99_max": [
+     0.9795,
+     0.9842,
+     0.9862,
+     0.9883
+    ],
+    "test_images_whose_nearest_train_is_in_[0.95,tau)": 674
+   },
+   "test-val": {
+    "[0.90,0.95)": {
+     "pairs": 384341,
+     "test_images_with_partner": 1184,
+     "val_images_with_partner": 593
+    },
+    "[0.95,tau)": {
+     "pairs": 195474,
+     "test_images_with_partner": 1130,
+     "val_images_with_partner": 571
+    },
+    ">=tau": {
+     "pairs": 558,
+     "test_images_with_partner": 227,
+     "val_images_with_partner": 162
+    },
+    "max_sim_quantiles_q50_q90_q99_max": [
+     0.9765,
+     0.9821,
+     0.9847,
+     0.9861
+    ],
+    "test_images_whose_nearest_val_is_in_[0.95,tau)": 903
+   }
+  },
+  "all_files": {
+   "sizes": {
+    "train": 9761,
+    "val": 1377,
+    "test": 2788
+   },
+   "val-train": {
+    "[0.90,0.95)": {
+     "pairs": 7599173,
+     "val_images_with_partner": 1377,
+     "train_images_with_partner": 9740
+    },
+    "[0.95,tau)": {
+     "pairs": 3594704,
+     "val_images_with_partner": 1347,
+     "train_images_with_partner": 9386
+    },
+    ">=tau": {
+     "pairs": 9303,
+     "val_images_with_partner": 537,
+     "train_images_with_partner": 1981
+    },
+    "max_sim_quantiles_q50_q90_q99_max": [
+     0.9794,
+     0.9844,
+     0.9864,
+     0.9887
+    ],
+    "val_images_whose_nearest_train_is_in_[0.95,tau)": 810
+   },
+   "test-train": {
+    "[0.90,0.95)": {
+     "pairs": 15253260,
+     "test_images_with_partner": 2788,
+     "train_images_with_partner": 9744
+    },
+    "[0.95,tau)": {
+     "pairs": 7602934,
+     "test_images_with_partner": 2738,
+     "train_images_with_partner": 9493
+    },
+    ">=tau": {
+     "pairs": 21676,
+     "test_images_with_partner": 1155,
+     "train_images_with_partner": 2764
+    },
+    "max_sim_quantiles_q50_q90_q99_max": [
+     0.9796,
+     0.9845,
+     0.9865,
+     0.9885
+    ],
+    "test_images_whose_nearest_train_is_in_[0.95,tau)": 1583
+   },
+   "test-val": {
+    "[0.90,0.95)": {
+     "pairs": 2129883,
+     "test_images_with_partner": 2783,
+     "val_images_with_partner": 1377
+    },
+    "[0.95,tau)": {
+     "pairs": 1052733,
+     "test_images_with_partner": 2657,
+     "val_images_with_partner": 1332
+    },
+    ">=tau": {
+     "pairs": 2741,
+     "test_images_with_partner": 549,
+     "val_images_with_partner": 381
+    },
+    "max_sim_quantiles_q50_q90_q99_max": [
+     0.9765,
+     0.9822,
+     0.9849,
+     0.9866
+    ],
+    "test_images_whose_nearest_val_is_in_[0.95,tau)": 2108
+   }
+  },
+  "mutual_top3_near_miss": {
+   "k": 3,
+   "mutual_pairs_total": 11918,
+   "by_band": {
+    "[0.95,tau)": {
+     "val-train": {
+      "pairs_all_files": 71,
+      "val_files_involved": 49,
+      "val_canonical_images_involved": 23,
+      "pairs_both_canonical": 17,
+      "val_copy_families_involved": 34,
+      "train_copy_families_involved": 38
+     },
+     "test-train": {
+      "pairs_all_files": 162,
+      "test_files_involved": 118,
+      "test_canonical_images_involved": 70,
+      "pairs_both_canonical": 48,
+      "test_copy_families_involved": 89,
+      "train_copy_families_involved": 90
+     },
+     "test-val": {
+      "pairs_all_files": 23,
+      "test_files_involved": 16,
+      "test_canonical_images_involved": 10,
+      "pairs_both_canonical": 8,
+      "test_copy_families_involved": 13,
+      "val_copy_families_involved": 13
+     },
+     "within_split_pairs_all_files": 269
+    },
+    "[0.90,0.95)": {
+     "val-train": {
+      "pairs_all_files": 1,
+      "val_files_involved": 1,
+      "val_canonical_images_involved": 1,
+      "pairs_both_canonical": 0,
+      "val_copy_families_involved": 1,
+      "train_copy_families_involved": 1
+     },
+     "test-train": {
+      "pairs_all_files": 6,
+      "test_files_involved": 5,
+      "test_canonical_images_involved": 3,
+      "pairs_both_canonical": 2,
+      "test_copy_families_involved": 3,
+      "train_copy_families_involved": 3
+     },
+     "test-val": {
+      "pairs_all_files": 9,
+      "test_files_involved": 5,
+      "test_canonical_images_involved": 3,
+      "pairs_both_canonical": 3,
+      "test_copy_families_involved": 3,
+      "val_copy_families_involved": 3
+     },
+     "within_split_pairs_all_files": 4
+    },
+    ">=tau": {
+     "val-train": {
+      "pairs_all_files": 0,
+      "val_files_involved": 0,
+      "val_canonical_images_involved": 0,
+      "pairs_both_canonical": 0,
+      "val_copy_families_involved": 0,
+      "train_copy_families_involved": 0
+     },
+     "test-train": {
+      "pairs_all_files": 0,
+      "test_files_involved": 0,
+      "test_canonical_images_involved": 0,
+      "pairs_both_canonical": 0,
+      "test_copy_families_involved": 0,
+      "train_copy_families_involved": 0
+     },
+     "test-val": {
+      "pairs_all_files": 0,
+      "test_files_involved": 0,
+      "test_canonical_images_involved": 0,
+      "pairs_both_canonical": 0,
+      "test_copy_families_involved": 0,
+      "val_copy_families_involved": 0
+     },
+     "within_split_pairs_all_files": 11373
+    }
+   },
+   "note": "cross-split pairs at >= tau that are mutual top-3 would be copy links; the build merged them into one lineage, so this count must be 0 by construction"
+  }
+ }
+}

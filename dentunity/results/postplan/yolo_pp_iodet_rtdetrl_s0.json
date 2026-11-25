@@ -1,0 +1,69 @@
+{
+ "provenance": "run",
+ "run": "pp_iodet_rtdetrl_s0",
+ "data": "iodet",
+ "model": "rtdetr-l.pt",
+ "imgsz": 640,
+ "epochs_full_passes": 40,
+ "shards": 1,
+ "batch": 2,
+ "seed": 0,
+ "checkpoint_selection": "best validation fitness (Ultralytics best.pt)",
+ "val": {
+  "box": {
+   "map50_95": 0.131008240748679,
+   "map50": 0.3299199613413502,
+   "map75": 0.08479601592175064,
+   "precision": 0.3560847454945804,
+   "recall": 0.36411152400658753,
+   "per_class_ap50_95": {
+    "Caries": 0.1371282815486244,
+    "Ulcer": 0.20258256503077338,
+    "Tooth Discoloration": 0.16030371996560566,
+    "Gingivitis": 0.02401839644971259
+   },
+   "per_class_ap50": {
+    "Caries": 0.45678497410449537,
+    "Ulcer": 0.4476737755501641,
+    "Tooth Discoloration": 0.3472320771725482,
+    "Gingivitis": 0.06798901853819338
+   },
+   "n_classes_evaluated": 4
+  },
+  "speed_ms": {
+   "preprocess": 0.6451581525752307,
+   "inference": 35.19091485314629,
+   "loss": 0.000277352706277675,
+   "postprocess": 11.407636263642297
+  }
+ },
+ "test": {
+  "box": {
+   "map50_95": 0.14969102459167655,
+   "map50": 0.37349958012645995,
+   "map75": 0.11207999771419111,
+   "precision": 0.44153516754435507,
+   "recall": 0.40253555848410816,
+   "per_class_ap50_95": {
+    "Caries": 0.12258266981451524,
+    "Ulcer": 0.2553237542945405,
+    "Tooth Discoloration": 0.1284242711720266,
+    "Gingivitis": 0.09243340308562384
+   },
+   "per_class_ap50": {
+    "Caries": 0.397838442028858,
+    "Ulcer": 0.5632156965205728,
+    "Tooth Discoloration": 0.2832996697275637,
+    "Gingivitis": 0.2496445122288453
+   },
+   "n_classes_evaluated": 4
+  },
+  "speed_ms": {
+   "preprocess": 0.6629967641583456,
+   "inference": 33.95347921889883,
+   "loss": 0.00023197757093843086,
+   "postprocess": 11.474743011900507
+  }
+ },
+ "logged_epochs_completed": 40
+}

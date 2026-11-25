@@ -1,0 +1,257 @@
+{
+ "frozen_at": "2026-11-11T13:10+04:00",
+ "frozen_before_any_test_evaluation": true,
+ "repo_name": "DentUnity build kit + baselines",
+ "benchmark_version": "v1",
+ "manifest_sha256": {
+  "io_cls.csv": "caa62b8e12c6d61bc27d8c6c68cc0faaff94bf7034a45064a660b6bea1fedc1b",
+  "io_det.csv": "d58bb6f1f285e6a770f2537d47403366d3577ad3c8dff6bdfab2022ebb4f58c8",
+  "px.csv": "5435d59ce73362cc3defe6d9bd273dd060c2dfa620a9d0c910fb009c93d35b76"
+ },
+ "tasks": {
+  "IO-CLS": {
+   "primary_metric": "macro-AP over 6 labels",
+   "secondary": [
+    "macro-AUROC",
+    "per-class AP"
+   ]
+  },
+  "IO-DET": {
+   "primary_metric": "box mAP50-95",
+   "secondary": [
+    "mAP50",
+    "per-class AP"
+   ]
+  },
+  "PX-DET": {
+   "primary_metric": "box mAP50-95 (classes present in test)",
+   "secondary": [
+    "mAP50",
+    "per-class AP"
+   ]
+  },
+  "PX-SEG": {
+   "primary_metric": "mask mAP50-95",
+   "secondary": [
+    "mask mAP50",
+    "box mAP50-95"
+   ]
+  }
+ },
+ "selection_rule": "All hyperparameters, checkpoints, read-out regularisation and ensemble weights are chosen on the validation split only. Each final configuration is evaluated on test exactly once; test numbers never feed back into any choice.",
+ "noise_axis": {
+  "detection_segmentation": "training seed (2 seeds for every main baseline; mean and per-seed values; the 'best' claim requires the best mean AND every seed of the winner above every seed of the runner-up, otherwise reported as a tie)",
+  "classification": "lineage-cluster bootstrap over test lineages (1000 reps) for frozen read-outs; 3 training seeds for fine-tuned models; a win requires a paired bootstrap 95% CI of the difference excluding 0"
+ },
+ "baselines": {
+  "IO-CLS": [
+   "frozen DINOv2 ViT-S/14, ViT-B/14, ImageNet ConvNeXt-T x {last-layer probe, DINOv2 linear-eval protocol (last-4 CLS + mean patch), full-depth lattice read-out}, logistic regression per label, C on val",
+   "fine-tuned ConvNeXt-T (ImageNet), 15 epochs, 3 seeds",
+   "fine-tuned DINOv2 ViT-S/14 (full fine-tune), 15 epochs, 3 seeds"
+  ],
+  "IO-DET": [
+   "YOLO11s @640, 40 full passes, 2 seeds",
+   "YOLO11n @640, 40 full passes, 1 seed"
+  ],
+  "PX-DET": [
+   "YOLO11s @640, 20 full passes (2 alternating shards per pass), 2 seeds",
+   "YOLO11n @640, 20 full passes, 1 seed",
+   "RT-DETR-l @640, 1 seed, only if compute remains (otherwise reported as not run)"
+  ],
+  "PX-SEG": [
+   "YOLO11s-seg @640, 20 full passes (2 shards), 2 seeds",
+   "YOLO11n-seg @640, 20 full passes, 1 seed"
+  ]
+ },
+ "best_recipe_candidates_declared_in_advance": {
+  "IO-CLS": [
+   "C1 multi-encoder full-depth lattice read-out (ViT-S + ViT-B + ConvNeXt-T lattices concatenated)",
+   "C2 validation-weighted probability ensemble of fine-tuned ConvNeXt-T (seed average) and C1 (weight grid 0..1 step 0.1 on val)"
+  ],
+  "PX-DET": [
+   "D1 lineage-aware training: canonical training images plus the re-exported copies of TRAINING lineages only (copies of val/test never used), compute-matched to the baseline (same number of image-steps), YOLO11s, 1-2 seeds"
+  ],
+  "decision": "A candidate is called best only if it beats the strongest baseline under the noise-axis rule above; otherwise the paper says it does not win."
+ },
+ "leak_analyses": {
+  "L1_px_controlled_swap": "Fixed PX-DET val/test. LEAKY train = canonical train with K random images replaced by the K re-exported copies of test images; CLEAN-CONTROL replaces the same K images by re-exports of training images (equal size, equal image type). YOLO11n @640, 15 full passes, 2 seeds per arm. Inflation = paired difference in test mAP.",
+  "L2_io_cls_hash_split": "Frozen read-outs trained on the earlier hash-deduplicated split (md5 + dHash) vs on the lineage split, both evaluated on the test images the two test sets share; plus the full-test numbers of each split.",
+  "L3_io_det_shipped_split": "YOLO11s trained on the shipped IO-DET train split, evaluated on the shipped validation split (97% of which shares a lineage with shipped train) vs the same recipe on our clean split.",
+  "L4_shipped_checkpoint": "The YOLOv8x-seg checkpoint shipped with the panoramic release, evaluated on our PX-DET test; we report what fraction of our test lineages occur in its training split (contaminated by construction, reported as such).",
+  "L5_cross_task": "Share of test images of one intraoral task whose copy lineage appears in the other task's training split when each task keeps its own (shipped or earlier) split."
+ },
+ "compute_policy": "Every job over ~2 CPU-minutes or using MPS goes through .cache/benchmark/run_heavy.sh (<=600 s, <=5 GB), chunked and resumable. YOLO11m does not fit (MPS out of memory at batch 8 under the 0.45 watermark, results/speed_bench.json); YOLO11s is the largest feasible size. Panoramic images are stored once at 640 px on the long side because all models run at imgsz 640.",
+ "priority_order": [
+  "pxdet_y11s_s0",
+  "pxseg_y11s_s0",
+  "pxdet_y11s_s1",
+  "pxseg_y11s_s1",
+  "iodet_y11s_s0",
+  "iodet_y11s_s1",
+  "classification (frozen + fine-tuned)",
+  "L4",
+  "L1 seed 0",
+  "L3",
+  "n-size baselines",
+  "D1",
+  "L1 seed 1",
+  "RT-DETR-l"
+ ],
+ "amendments": [
+  {
+   "at": "2026-11-11T13:40+04:00",
+   "before_any_test_evaluation": true,
+   "change": "IO-CLS labels are now the union of the source folders holding a byte-identical file (5,563 files -> 3,899 images, 392 multi-label). The earlier composite had propagated labels across dHash near-duplicate groups, which gave 250 images all six labels. Intraoral splits re-drawn with the same procedure (panoramic manifest unchanged). Also fixed the label order (index 4 = tooth discoloration, 5 = mouth ulcer).",
+   "manifest_sha256": {
+    "io_cls.csv": "b813548d8fe3690d1a2e1a8e9cbf37910477ee5fed54022c005494c7013cf64b",
+    "io_det.csv": "4ea5260339585c618a984cd2da286698193fc025e0d8b31c994e1f97c0036a3c",
+    "px.csv": "5435d59ce73362cc3defe6d9bd273dd060c2dfa620a9d0c910fb009c93d35b76"
+   }
+  },
+  {
+   "at": "2026-11-11T13:40+04:00",
+   "before_any_test_evaluation": true,
+   "change": "Speed benchmark (results/speed_bench.json): YOLO11m and RT-DETR-l (batch 4) run out of MPS memory under the 0.45 watermark; YOLO11s @1024 is about half the speed of @640. Main detectors stay YOLO11s @640; RT-DETR-l is attempted last at batch 2 and reported as not run if it does not finish."
+  },
+  {
+   "at": "2026-11-11T14:10+04:00",
+   "before_any_test_evaluation": true,
+   "change": "io_det.csv no longer carries box coordinates (re-derived from the upstream label files by the build kit); splits unchanged.",
+   "manifest_sha256": {
+    "io_cls.csv": "b813548d8fe3690d1a2e1a8e9cbf37910477ee5fed54022c005494c7013cf64b",
+    "io_det.csv": "03429055908a17e4420a8b35f0359e144c53c1d1cb15bc8a54c8abd77793e779",
+    "px.csv": "5435d59ce73362cc3defe6d9bd273dd060c2dfa620a9d0c910fb009c93d35b76"
+   }
+  },
+  {
+   "at": "2026-11-11T13:35+04:00",
+   "before_any_test_evaluation": true,
+   "requested_by": "user via coordinator",
+   "change": "Added T1 (training value, external benchmark): fine-tune YOLO11s on DENTEX (fully annotated quadrant-enumeration-diagnosis subset, 4 diagnosis classes; official split 705 train / 50 validation / 250 test; licence on the official Hugging Face page: CC BY-NC-SA 4.0) from (a) COCO-pretrained weights and (b) our PX-DET YOLO11s checkpoint of the same seed (trained on the DentUnity train split only). Identical recipe for both arms: imgsz 640, 40 epochs, batch 8, best validation fitness on the official 50-image validation split, test evaluated once. 2 seeds if compute allows, else 1 (stated). Before training, DENTEX images are checked for copy lineages against all 13,932 DentUnity panoramic files with the panoramic embedding rule (flip-symmetrised DINOv2 ViT-S/14, cosine >= 0.981); overlapping DENTEX test images are dropped and the overlap is reported. Queued after the L3 item; if not finished by ~Nov 14 it is reported as not run.",
+   "metric": "box mAP50-95 and mAP50 on the DENTEX test images (4 diagnosis classes), Ultralytics validator"
+  },
+  {
+   "at": "2026-11-11T13:35+04:00",
+   "before_any_test_evaluation": true,
+   "requested_by": "user via coordinator",
+   "change": "Definition used in the paper: 'state of the art on DentUnity' = the best model on DentUnity's copy-free test split of a task among every model evaluated under this frozen protocol, including the shipped YOLOv8x-seg checkpoint. Claimed per task only where the noise-axis rule above shows a win; otherwise reported as a tie or a loss."
+  },
+  {
+   "at": "2026-11-11T13:55+04:00",
+   "before_any_test_evaluation": true,
+   "change": "T1 evaluation set corrected after inspecting the release: the 250 official test images ship LabelMe labels in an 8-type Turkish clinical scheme (e.g. curettage, canal, healthy, extraction) that does not map one-to-one to the 4 DENTEX diagnoses, while the 50 official validation images carry the 4-class COCO labels (182 boxes). T1 therefore trains on the 705 official training images for a fixed 40 epochs and evaluates the LAST checkpoint once on the 50 official validation images (no checkpoint selection, no validation during training). Both arms identical; 2 seeds if compute allows."
+  },
+  {
+   "at": "2026-11-11T14:45+04:00",
+   "before_any_test_evaluation": true,
+   "requested_by": "coordinator (compute contention)",
+   "change": "Queue order only: first seeds of PX-DET, PX-SEG and IO-DET, then classification, L4, L1 seed 0, L3 and DENTEX seed 0, then second seeds and extras. No model, schedule or metric changed."
+  },
+  {
+   "at": "2026-11-11T14:50+04:00",
+   "before_any_test_evaluation": true,
+   "change": "Previous queue-order amendment reverted: the queue follows priority_order as written; T1 DENTEX stays after L3."
+  },
+  {
+   "at": "2026-11-11T16:45+04:00",
+   "before_any_test_evaluation": true,
+   "change": "PX-SEG: YOLO11s-seg runs out of MPS memory at batch 8 under the 0.45 watermark; Ultralytics' automatic fallback retrains at batch 4 (nominal batch 64 via gradient accumulation is unchanged). All PX-SEG runs therefore use batch 4 (seed 0 through the automatic fallback, later runs set it explicitly)."
+  },
+  {
+   "at": "2026-11-14T14:05+04:00",
+   "before_any_test_evaluation_of_affected_runs": true,
+   "requested_by": "coordinator (session restart, 30 h of slot left)",
+   "change": "Queue order only: pxseg s0, iodet s0, cls_frozen + cls_ft seed 0 (both models), L4, L1 seed 0, DENTEX prep + seed 0 (both arms), pxdet/pxseg/iodet seed 1, n-size baselines, L2 (cls_frozen_hash), then the rest (cls_ft seeds 1-2, L3, DENTEX seed 1, D1, L1 seed 1, RT-DETR). Selection rule, noise-axis rule and all recipes unchanged. New training stops at 2026-11-16 20:00 local."
+  },
+  {
+   "at": "2026-11-14T17:50+04:00",
+   "before_any_test_evaluation_of_new_runs": true,
+   "requested_by": "user via coordinator",
+   "change": "New candidate configurations to compete with the shipped YOLOv8x-seg checkpoint under the frozen protocol (validation-only selection, test once per configuration, every attempt reported): (M1) YOLO11m-seg on PX-SEG, COCO init, 640 px, 20 passes (4 shards per pass), batch 4; (M2) YOLO11m on PX-DET, same schedule, batch 4. Rule fixed now: a second seed of M1/M2 is trained only if its seed-0 VALIDATION score (mask / box mAP50-95) exceeds that of YOLO11s seed 0 on the same task; otherwise it is reported as not selected. The per-task best model is then the validation-selected family (2 seeds); a 'state of the art on DentUnity' claim requires every seed of it to exceed every other evaluated model on test, including the shipped checkpoint (a single fixed model). The shipped checkpoint's PX-DET box mAP is measured through rectangle polygons (segment validator; box metrics only). Queue: L4 fix, L1 s0, DENTEX s0, M1 s0, PX-SEG s1, PX-DET s1, M2 s0, IO-DET s1, L1 s1, DENTEX s1, M1/M2 s1 (if selected), YOLO11n baselines, L2, cls_ft seeds 1-2, L3, D1; RT-DETR dropped if time runs out. New training stops 2026-11-16 20:00 local."
+  },
+  {
+   "at": "2026-11-14T18:05+04:00",
+   "type": "post-hoc descriptive analysis (requested by user via coordinator)",
+   "change": "L4b: score the shipped checkpoint and our PX models (YOLO11s, later YOLO11m) on the PX-DET / PX-SEG test images with NO copy lineage in the shipped training split, with image-bootstrap 95% CIs and paired (ours minus shipped) bootstrap differences. Uses the same predictions as the standard test evaluation (no new model selection). Reported whatever the result, in the leak section. It does NOT change the state-of-the-art rule, which stays on the full copy-free test split."
+  },
+  {
+   "at": "2026-11-14T21:10+04:00",
+   "before_any_test_evaluation_of_affected_runs": true,
+   "requested_by": "coordinator (audit)",
+   "change": "RT-DETR-l dropped: it exceeds the 0.45 MPS memory cap at batch 4 and would not finish at batch 2 before the stop; the paper states it was planned and not run (it was never in the verdict's REQUIRED list). Queue order: cls_frozen_hash (L2), cls_ft seeds 1-2 and iodet_shipped (L3) moved directly after M1 seed 0; iodet_y11n moved after iodet seed 1. IO-CLS verdict: every candidate is ours and there is no external comparator; the verdict reports the selected model and the models statistically tied with it ('met, tied (ours)') instead of 'not met' when the strongest other is one of our own models within the paired interval. Selection and noise rules otherwise unchanged. If D1 or a YOLO11n baseline cannot finish by 2026-11-16 20:00, it is dropped by a further amendment and removed from REQUIRED."
+  },
+  {
+   "at": "2026-11-15T14:50+04:00",
+   "change": "IO-DET: YOLO11n seed 0 has the best validation mean (12.26 vs YOLO11s 12.06 over two seeds), so it is the validation-selected IO-DET family and receives a second seed (iodet_y11n_s1, queued after DENTEX seed 1) so that the claim rule can be applied. IO-DET has no external comparator (no public model for this subset); as for IO-CLS, when the selected family and the strongest other model are both our models and their seeds overlap, the verdict reads 'tied (ours)' instead of 'not met'. The rule for PX-DET and PX-SEG, where the shipped checkpoint is an external comparator, is unchanged.",
+   "before_any_test_evaluation_of_new_runs": false,
+   "disclosure": "Made after the seed-0 test scores of IO-DET YOLO11n (14.4) and YOLO11s (15.3) and the seed-1 test score of YOLO11s (14.5) were known. It mirrors the IO-CLS tie rule exactly and implies no state-of-the-art claim; verdict text: 'no external comparator; selected YOLO11n, statistically tied with YOLO11s (ours)'. Accepted by the coordinator with these conditions (2026-11-15)."
+  },
+  {
+   "at": "2026-11-15T15:05+04:00",
+   "type": "wording of verdict labels",
+   "change": "Verdict labels for tasks without an external comparator (IO-CLS, IO-DET) renamed from 'met' / 'met, tied (ours)' to 'best (ours)' / 'tied (ours)' so that no label implies a state-of-the-art claim. Labels for PX-DET and PX-SEG unchanged."
+  },
+  {
+   "at": "2026-11-16T13:15+04:00",
+   "type": "added reference baseline (user request 2026-11-16, via coordinator; cut-off 2026-11-16 22:00 local)",
+   "before_any_test_evaluation_of_affected_runs": true,
+   "change": "IO-CLS zero-shot vision-language reference, no training. Candidates: 2 local CLIP-family models (BiomedCLIP ViT-B/16 PubMedBERT-256 and OpenAI CLIP ViT-B/16, both loaded with open_clip from the local Hugging Face cache) x 4 prompt-template sets fixed here (T1 'a photo of {}.'; T2 'an intraoral photograph showing {}.'; T3 'a clinical photograph of the mouth with {}.'; T4 = T1+T2+T3 averaged). Label score = cosine similarity between the image embedding and the label's text embedding (mean over the set's templates). Selection: validation macro-AP only. Test: scored once, for the selected candidate only, with macro-AP, macro-AUROC and the same lineage-cluster bootstrap (n=1000, seed 0). Images never leave the machine; no external API. Reported whatever the result in Tab. 3 and one main-text sentence; if it beats a reported reference model the coordinator is told before any claim is reworded."
+  },
+  {
+   "at": "2026-11-16T13:15+04:00",
+   "type": "added reference baseline (user request 2026-11-16, via coordinator; cut-off 2026-11-16 22:00 local)",
+   "before_any_test_evaluation_of_affected_runs": true,
+   "change": "PX-SEG box-prompted SAM reference: SAM ViT-B (Ultralytics sam_b.pt, single-mask output) prompted with the boxes predicted by the validation-selected PX-SEG family (YOLO11s-seg, seeds 0 and 1, best.pt) on the same letterboxed 640-pixel images inside the Ultralytics SegmentationValidator. Boxes, classes and confidences are the YOLO11s ones; only the masks are replaced by SAM masks, resized to the validator's mask resolution, and scored with the same mask mAP50:95 / mAP50. Fixed configuration, so nothing is selected; validation is computed first as a pipeline check, test once per seed. Heavy compute only through run_heavy.sh; anything not finished by 22:00 local is dropped and stated as not run."
+  },
+  {
+   "at": "2026-11-16T13:19+04:00",
+   "type": "bug fix and disclosure",
+   "change": "The first zero-shot run (13:16-13:18) loaded OpenAI CLIP ViT-B/16 with standard GELU, while its pretrained weights need QuickGELU (open_clip warned of the mismatch), so that model was misconfigured. The whole procedure is re-run with the 'ViT-B-16-quickgelu' config: validation selection over the same 8 candidates, then test once for the selected candidate. Discarded first run, recorded for disclosure: validation macro-AP BiomedCLIP T1-T4 0.204/0.198/0.219/0.203, misconfigured CLIP T1-T4 0.217/0.227/0.217/0.227; selected misconfigured CLIP/T2, test macro-AP 0.194 [0.174, 0.222]. Nothing else changes."
+  },
+  {
+   "at": "2026-11-16T15:52+04:00",
+   "type": "run stopped (author decision)",
+   "change": "The box-prompted SAM PX-SEG run was stopped by the authors (all experiments halted at the user's request) during the seed-1 test pass. Completed and reported: seed 0 validation (SAM masks 8.8 vs YOLO11s masks 11.7 mask mAP50:95, box mAP identical to the recorded run) and seed 0 test (6.6 vs 9.0). Seed 1 (test and validation) was not run. The reference beats no reported model."
+  },
+  {
+   "at": "2026-11-17T09:32+04:00",
+   "type": "post-hoc descriptive re-audit (user request after external review; CPU only)",
+   "change": "Strict-link re-audit of every intraoral leak figure: rebuild the intraoral copy graph from the cached link embeddings with strict links only (identical sha256 and mutual nearest neighbours at the 0.950 precision threshold; export keys and registration exist only for panoramic files), without the 0.731 recall edges and without the cached preliminary IO-CLS graph, and recompute the hash-deduplicated IO-CLS test leak, the shipped IO-DET validation leak, both cross-task leaks, the largest intraoral lineage and the contamination of the DentUnity splits. For panoramic files, recompute the shipped-test leak with export keys, sha256 and registration only (no embedding edges). No model is trained or selected; the splits are unchanged. Both columns (all links / strict links) are reported whatever the result."
+  },
+  {
+   "at": "2026-11-17T11:07+04:00",
+   "type": "post-hoc robustness analysis (user request 2026-11-17; CPU only)",
+   "change": "Repeated lineage-level 5-fold cross-validation of the IO-CLS frozen read-outs (9 encoder x descriptor read-outs and the C1 multi-encoder lattice) on the cached features: all 3,899 IO-CLS images, the largest lineage kept in training as in the split, the other 519 lineages assigned to 5 folds at random (3 repeats with seeds 0-2). Each read-out keeps the regularisation C chosen on the original validation split (no new selection), standardisation and the 1,024-d PCA are fitted on the training folds. Reported: mean and spread of fold macro-AP per read-out, and tiers (read-outs whose paired fold-level difference to the best has a 95% interval that includes zero). Fine-tuned networks and C2 need training and are not included. Detection stays on the fixed split. Reported whatever the result."
+  },
+  {
+   "at": "2026-11-17T13:05+04:00",
+   "type": "post-plan analysis A (external review request; CPU only)",
+   "reason": "external review request",
+   "change": "Label-conflict breakdown of the IO-DET exact-duplicate groups (data/inv_io_det.json): each of the 79 conflicting groups (of 101) is assigned one type in a fixed order (box count differs; else class multiset differs; else some box's best same-class IoU < 0.5 after optimal matching; else min IoU in [0.5, 0.9); else IoU >= 0.9), and counted by the DentUnity split of the kept copy. Then the IO-DET test mAP50:95 and mAP50 of the validation-selected YOLO11n models (seed 0 = released weight, seed 1) are recomputed from per-image matches with existing weights on all 273 test images and without the test images whose sha256 group has conflicting labels, with a 95% paired image-bootstrap interval (2,000 resamples) for the difference. No training, no selection. Reported whatever the result."
+  },
+  {
+   "at": "2026-11-17T13:05+04:00",
+   "type": "post-plan analysis B (external review request; training via run_heavy.sh)",
+   "reason": "external review request",
+   "change": "DENTEX transfer strengthening, same recipe as the registered DENTEX runs (YOLO11s, 640 px, 40 epochs, batch 8, last checkpoint, no validation selection). (i) 95% paired image-bootstrap interval (2,000 resamples) of DentUnity-init minus COCO-init on the 50 evaluation images from the existing seed 0/1 last.pt files. (ii) Seeds 2, 3, 4 for both inits (DentUnity init = PX-DET YOLO11s best.pt of seed s mod 2, the only two PX-DET YOLO11s checkpoints that exist) -> 5 seeds; report per-seed, mean and the paired interval with images resampled jointly across seeds. (iii) 5-fold cross-validation over the 705 DENTEX training images (folds fixed by a seeded permutation of the sorted file list; train on 4 folds, evaluate the held-out fold with the last checkpoint), both inits, seed 0, DentUnity init = PX-DET YOLO11s seed 0; report per-fold and mean difference with a fold-stratified image-bootstrap interval and a fold-level t interval. All runs reported whatever the result; new DENTEX weights are not released."
+  },
+  {
+   "at": "2026-11-17T13:05+04:00",
+   "type": "post-plan analysis C (external review request; training via run_heavy.sh)",
+   "reason": "external review request",
+   "change": "RT-DETR-L (Ultralytics, COCO init) on IO-DET with the YOLO11 IO-DET protocol where feasible: same data tree and splits, 640 px, 40 epochs, best validation fitness checkpoint, test evaluated once, AMP off (MPS), batch 2 instead of 8 (memory cap), 1 seed. If it exceeds the 0.45 MPS watermark / 5 GB guard or cannot finish by 2026-11-22, the peak memory and point of failure are reported instead of a number. Not used for any selection or claim of the main paper; weights not released."
+  },
+  {
+   "at": "2026-11-17T13:05+04:00",
+   "type": "post-plan analysis D (external review request; CPU only)",
+   "reason": "external review request",
+   "change": "Same-patient candidate bound for the panoramic split: from the cached panoramic link embeddings (data/linkemb_px.npz), count cross-split pairs (val-train, test-train, test-val) with cosine in the high-similarity band [0.95, 0.981) just below the copy threshold (0.9806), and the number of evaluation images with at least one such training partner; also bands [0.90, 0.95) and >= threshold for reference. Counts only, no file names. These are candidates, not confirmed same-patient pairs (no clinician or identity check). A visual spot-check is not performed (no image leaves the machine and none is shown to the analysing agent)."
+  },
+  {
+   "at": "2026-11-17T13:14+04:00",
+   "type": "post-plan analysis D, addition (external review request; CPU only)",
+   "reason": "external review request",
+   "change": "The plain cosine band count of analysis D turned out to be dominated by chance similarity (radiographs are uniformly similar to the descriptor: about 28% of all cross-split canonical pairs fall in [0.95, 0.981), and the >= 0.981 cross-split count matches the 0.1% random-pair rate that defines the threshold). Both counts are still reported. Added a second candidate definition that follows the build's link rule: cross-split pairs that are mutual top-3 nearest neighbours (as for copy links) with cosine in [0.95, 0.981), i.e. pairs that miss a copy link only because of the threshold. Counts only; candidates, not confirmed patients."
+  }
+ ]
+}
