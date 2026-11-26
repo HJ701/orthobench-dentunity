@@ -36,7 +36,7 @@ downloading.
 - **DentUnity decision:** build kit only.
 
 ## What DentUnity adds, and why it can be shared
-The files in this repository contain:
+The files in this folder contain:
 - content hashes and image sizes of upstream files;
 - our own split and lineage assignments, with anonymous lineage ids;
 - the canonical / re-export roles;

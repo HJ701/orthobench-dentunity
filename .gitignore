@@ -1,0 +1,11 @@
+# Local environments and caches
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Downloads and rebuilt data (never commit images)
+dentunity/upstream/
+dentunity/dentunity_v1/
+dentunity/data/
+result.json

@@ -1,6 +1,6 @@
 # DentUnity reference model weights
 
-The validation-selected reference model of each dense task (seed 0), as reported in the paper.
+The validation-selected reference model of each dense task (seed 0), as reported in the thesis.
 
 | File | Model | Task |
 |---|---|---|

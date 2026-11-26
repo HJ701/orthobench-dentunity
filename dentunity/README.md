@@ -28,19 +28,19 @@ python run_experiment.py --smoke
 
 ## Build the dataset from the upstream releases
 
-See `release/BUILD.md`. In short:
+See `dataset/README.md`. In short:
 
 ```bash
-python -m dentunity.rebuild --pano-root upstream/pano --oral-root upstream/oral --out dentunity_v1
+python dataset/build/build_dentunity.py --pano-root upstream/pano --oral-root upstream/oral --out dentunity_v1
 ```
 
 ## Results (copy-free test splits)
 
-| Task | Metric (test, %) | Best model | Score |
+| Task | Metric (test, %) | Validation-selected model | Score |
 |:-|:-|:-|:-|
 | IO-CLS | macro-AP | C2_ensemble | 83.3 |
-| IO-DET | box mAP50-95 | YOLO11s | 14.9 |
-| PX-DET | box mAP50-95 | YOLO11s | 13.5 |
+| IO-DET | box mAP50-95 | YOLO11n | 14.8 |
+| PX-DET | box mAP50-95 | YOLO11m | 14.1 |
 | PX-SEG | mask mAP50-95 | YOLO11s-seg | 8.7 |
 
 All numbers come from `results/summary_*.json`; two-seed detection rows report the mean.
@@ -51,9 +51,11 @@ All numbers come from `results/summary_*.json`; two-seed detection rows report t
 python run_experiment.py build        # lineages, splits, manifests, audits
 python run_experiment.py queue        # one guarded chunk of the frozen plan (repeat until done)
 python run_experiment.py summarize    # results/summary_*.json
-python scripts/make_tables.py ../../paper && python scripts/fig_dataset.py && python scripts/fig_teaser.py
+python scripts/make_tables.py out && python scripts/fig_dataset.py && python scripts/fig_teaser.py   # LaTeX tables are written to out/sec
 ```
 
+These commands record how the released results were produced. They need development
+inputs that are not part of the build kit, so they do not run on a fresh clone.
 The frozen plan with timestamped amendments is `plan.json`.
 
 ## Data access

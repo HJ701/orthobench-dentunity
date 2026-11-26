@@ -15,7 +15,7 @@ The dataset has these properties:
 - **Copy-free splits:** the source releases store many copies of the same image (re-exports, resized versions, augmentations). DentUnity links all copies into copy lineages and assigns whole lineages to train / validation / test **jointly for every task**. As a result, no validation or test image of any task has a copy in the training data of any task.
 - **How bad the shipped splits are:** in the official panoramic split, 96.1% of the test images have a copy in training.
 
-**This repository is a build kit. It contains no images and no upstream annotation files.**
+**This folder is a build kit. It contains no images and no upstream annotation files.**
 You download the upstream releases yourself and run one script. The script identifies every
 file by the sha256 of its bytes, never by its original file name, and writes the dataset in
 standard formats.
@@ -80,7 +80,7 @@ Evaluation rule:
 - Re-exports may be used for training only.
 
 ## Licence and terms
-- **Build-kit files:** this repository (manifests, lineage and split lists, taxonomy, build script) is released under CC BY-NC 4.0.
+- **Build-kit files:** this folder (manifests, lineage and split lists, taxonomy, build script) is released under CC BY-NC 4.0.
 - **Not included:** images and upstream annotations. They remain under their publishers' terms, which you accept when you download them.
 - **Upstream licences** (details and verbatim quotes in `SOURCES.md`):
   - The panoramic re-publisher declares "Apache 2.0" and names Roboflow as its source, without naming the upstream projects.

@@ -22,7 +22,5 @@ SOFTWARE.
 
 ------------------------------------------------------------------------------
 NOTE ON DATA. This MIT license covers the CODE ONLY. The OrthoBench clinical
-imaging cohort is restricted research data governed by a separate data-use
-agreement and pending ethics/IRB and PHI review; it is NOT covered by this
-license, is NOT included in this repository, and is NOT released. See README
-(Data access) for terms.
+imaging cohort is restricted research data; it is NOT covered by this
+license and is NOT included in this repository. See README (Data access).

@@ -1,6 +1,6 @@
-# Terms for this repository
+# Terms for this folder
 
-This repository holds an evaluation protocol and aggregate, non-identifying results of
+This folder holds an evaluation protocol and aggregate, non-identifying results of
 the OrthoBench benchmark. It contains no clinical images, no patient identifiers and no
 patient-level records.
 

@@ -17,7 +17,7 @@ expert label.** Re-scoring identical predictions against the expert label re-ord
 
 ## News
 
-- **November 2026:** encoder zoo (11 frozen encoders x 3 heads,
+- **November 2026:** encoder zoo (10 frozen photographic encoders x 3 heads, RAD-DINO on radiographs,
   plus fine-tuned backbones), split-unit and label-version leaderboard statistics under a
   frozen analysis plan, label ceiling and human reference, label-error detection,
   confident-learning pruning, late fusion.
@@ -73,14 +73,16 @@ Label ceiling (`results/label_analysis.json`): the adjudicated label scores 0.65
 With approved access to the restricted data (`DR`) and the audit workbook (`WB`):
 
 ```bash
-for M in opg cephalogram intraoral; do
-  python scripts/extract_zoo.py --data-root "$DR" --modality $M \
-    --backbones resnet18,resnet50,convnext_tiny,convnext_large,dinov2,dinov2_base,dinov2_large,rad_dino,siglip2,clip_b16,biomedclip
+ZOO=resnet18,resnet50,convnext_tiny,convnext_large,dinov2,dinov2_base,dinov2_large,siglip2,clip_b16,biomedclip
+python scripts/extract_zoo.py --data-root "$DR" --modality intraoral --backbones "$ZOO"
+for M in opg cephalogram; do                               # RAD-DINO is evaluated on radiographs only
+  python scripts/extract_zoo.py --data-root "$DR" --modality $M --backbones "$ZOO,rad_dino"
 done
 python scripts/run_benchmark.py split                      # results/split_zoo.json
 python scripts/run_benchmark.py predict --workbook "$WB"   # per-patient predictions (gitignored)
+python -c "from orthobench import manifest, finetune; finetune.cache_pixels(manifest.modality_table('$DR', 'intraoral'), '$DR', 'data/feat_cache/pixels_intraoral_256.u8')"   # pixel cache read by finetune_reference.py
 for A in dinov2 resnet50 convnext_tiny; do
-  python scripts/finetune_reference.py --workbook "$WB" --arch $A --seeds 0 1 2
+  python scripts/finetune_reference.py --workbook "$WB" --arch $A --seeds 0 1 2 --batch 16
 done
 python scripts/run_benchmark.py analyze --workbook "$WB"   # zoo_reference, label_analysis, fusion_late
 python scripts/make_figures_benchmark.py
@@ -93,8 +95,8 @@ directory. Results JSONs are aggregate only. Earlier experiments are reproduced 
 
 ## Data access
 
-Clinical images and case-level records are not included here. The study received
-institutional ethics approval (individual consent waived) and the clinics' written
+Clinical images and case-level records are not included here. The study is
+IRB approved (individual consent waived) and has the clinics' written
 permission for public release.
 The de-identified dataset will be released publicly under CC BY-NC 4.0
 once the manual pixel review is complete. The code license does not apply to clinical data. OCR screening

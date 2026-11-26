@@ -1,4 +1,4 @@
-# Source licences and provenance (supplement table)
+# Source licences and provenance
 
 Accessed 2026-11-11 through the Kaggle public metadata API (`/api/v1/datasets/view`, `/metadata`, `/list`). No images or archives were downloaded. Roboflow Universe pages returned HTTP 403 to automated fetching, so the table records no Roboflow licence. Full quotes and URLs are in `licence_inventory.json`.
 

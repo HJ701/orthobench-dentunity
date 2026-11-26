@@ -11,11 +11,11 @@ cls_best = C.get("best_by_val")
 cls_val = C.get("models", {}).get(cls_best, {}).get("test_macro_ap") if cls_best else None
 rows = [
     ("IO-CLS", "macro-AP", cls_best or "pending", f(cls_val)),
-    ("IO-DET", "box mAP50-95", "YOLO11s", f(g("iodet_y11s", "test_box_map50_95_mean"))),
-    ("PX-DET", "box mAP50-95", "YOLO11s", f(g("pxdet_y11s", "test_box_map50_95_mean"))),
+    ("IO-DET", "box mAP50-95", "YOLO11n", f(g("iodet_y11n", "test_box_map50_95_mean"))),
+    ("PX-DET", "box mAP50-95", "YOLO11m", f(g("pxdet_y11m", "test_box_map50_95_mean"))),
     ("PX-SEG", "mask mAP50-95", "YOLO11s-seg", f(g("pxseg_y11s", "test_mask_map50_95_mean"))),
 ]
-table = "| Task | Metric (test, %) | Best model | Score |\n|:-|:-|:-|:-|\n" + "\n".join(
+table = "| Task | Metric (test, %) | Validation-selected model | Score |\n|:-|:-|:-|:-|\n" + "\n".join(
     f"| {a} | {b} | {c} | {d} |" for a, b, c, d in rows)
 T = S.get("total", {})
 readme = f"""# DentUnity: one copy-free dataset to train and evaluate dental classification, detection and segmentation
@@ -50,10 +50,10 @@ python run_experiment.py --smoke
 
 ## Build the dataset from the upstream releases
 
-See `release/BUILD.md`. In short:
+See `dataset/README.md`. In short:
 
 ```bash
-python -m dentunity.rebuild --pano-root upstream/pano --oral-root upstream/oral --out dentunity_v1
+python dataset/build/build_dentunity.py --pano-root upstream/pano --oral-root upstream/oral --out dentunity_v1
 ```
 
 ## Results (copy-free test splits)
@@ -68,7 +68,7 @@ All numbers come from `results/summary_*.json`; two-seed detection rows report t
 python run_experiment.py build        # lineages, splits, manifests, audits
 python run_experiment.py queue        # one guarded chunk of the frozen plan (repeat until done)
 python run_experiment.py summarize    # results/summary_*.json
-python scripts/make_tables.py ../../paper && python scripts/fig_dataset.py && python scripts/fig_teaser.py
+python scripts/make_tables.py out && python scripts/fig_dataset.py && python scripts/fig_teaser.py   # LaTeX tables are written to out/sec
 ```
 
 The frozen plan with timestamped amendments is `../plan.json`.

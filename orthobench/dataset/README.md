@@ -14,7 +14,7 @@ the adjudicated label differs from the source label for 75 of
 221 classifiable patients (33.9%). The
 benchmark scores every model against both label versions under a frozen protocol.
 
-**This repository contains no images and no patient-level records.**
+**This folder contains no images and no patient-level records.**
 
 ## Contents
 
@@ -28,7 +28,7 @@ benchmark scores every model against both label versions under a frozen protocol
 | `leaderboard/radiograph_tracks.csv` | OPG and cephalogram tracks (linear head) |
 | `leaderboard/expert_reference.csv` | Expert reviewers and the adjudicated label scored against the source label |
 | `results/*.json` | Aggregate result files behind the reported tables and figures (no identifiers) |
-| `LICENSE.md` | Terms for this repository |
+| `LICENSE.md` | Terms for this folder |
 
 ## How to obtain the data
 
@@ -37,7 +37,7 @@ metadata) will be released publicly under CC BY-NC 4.0 on a public dataset host,
 as the participating clinics have agreed in writing, once the manual
 pixel review for identifiers, including non-Latin text, is complete. Until then this folder
 holds the protocol and the aggregate results. The code to reproduce every experiment and to
-rebuild all tables from the aggregate files here is in the companion code repository.
+rebuild all tables from the aggregate files here is in the parent `orthobench/` directory.
 
 ## Splits
 
@@ -56,9 +56,9 @@ Patient-keyed split definitions will be part of the public dataset release.
 - Clinical images and case-level records: released publicly under CC BY-NC 4.0 on a public
   dataset host once the manual pixel review (including
   non-Latin text) is complete; the clinics have given written permission for this release.
-- Protocol and aggregate results in this repository: released under CC BY-NC 4.0
+- Protocol and aggregate results in this folder: released under CC BY-NC 4.0
   (see `LICENSE.md`); do not attempt to re-identify any patient.
-- Code: MIT, in the companion code repository.
+- Code: MIT, in the parent `orthobench/` directory.
 
 ## Citation
 
